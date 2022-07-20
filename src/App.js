@@ -18,16 +18,16 @@ const App = () => {
 
   // AUTHENTICATE
   const getApiKey = async () => {
-    const url = 'https://identity-va.mediavalet.net/token'
+    const url = 'https://identity-cato.mediavalet.net/token'
     const headers = { 'content-type': 'application/json' }
-    const body = "grant_type=password&username=allenliadmin%40mediavalet.net&password=8Z9M7bR!&client_id=0cce9ca4-93a5-48a7-9e6a-29022fa16c51"
+    const body = "grant_type=password&username=mlseadmin%40mediavalet.net&password=GzJD9zDwwqPLR48&client_id=f72d94a8-82c6-4556-b418-abd299d72fb2"
     const result = await axios.post(url, body, headers)
     setApiKey("bearer " + result.data.access_token)
   }
 
   // TOTAL ASSET COUNT
   const getAssetCount = async () => {
-    const url = 'https://mv-api-usva.mediavalet.net/assets/search'
+    const url = 'https://mv-api-cato.mediavalet.net/assets/search'
     const data = {
       "search": "",
       "count": 1,
@@ -40,28 +40,34 @@ const App = () => {
   }
 
   // ITERATE OFFSET
-  const getAssets = async (offset) => {
-    const url = 'https://mv-api-usva.mediavalet.net/assets/search'
+  const getAssets = async (offset, dateFilter) => {
+    const url = 'https://mv-api-cato.mediavalet.net/assets/search'
     // const url = `https://mv-api-usil.mediavalet.net/categories/aec0ba15-92bb-43d7-8095-ccf2662b1fec/assets?count=1000&offset=${offset}&sort=record.createdAt+D`
     const data = {
       "search": "",
       "count": 1000,
       "offset": offset,
-      "filters": "",
+      "filters": dateFilter,
       "sort": "record.createdAt D"
     }
     const tempAssets = await axios.post(url, data, { headers: headers })
     setAssets(assets => [...assets, ...tempAssets.data.payload.assets])
     if (offset < assetCount) {
-      offset += 1000
-      getAssets(offset)
+      // if offset greater thyepan 100k (azure limit)
+      if (offset >= 100000) {
+        dateFilter = ("DateUploaded LE " + tempAssets.data.payload.assets[999].createdAt)
+        getAssets(0, dateFilter)
+      } else {
+        offset += 1000
+        getAssets(offset, dateFilter)
+      }
     }
   }
 
   // get custom attributes mapping
   const getCustomAttributes = () => {
     let tempAttributes = []
-    const url = 'https://mv-api-usva.mediavalet.net/attributes'
+    const url = 'https://mv-api-cato.mediavalet.net/attributes'
     axios.get(url, { headers: headers })
       .then(res => {
         for (let attribute of res.data.payload) {
