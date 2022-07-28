@@ -9,7 +9,7 @@ const App = () => {
   const [filteredAssets, setFilteredAssets] = useState([])
   const [cognitiveImageMetadata, setCognitiveImageMetadata] = useState([])
   const [cognitiveVideoMetadata, setCognitiveVideoMetadata] = useState([])
-  const [apiKey, setApiKey] = useState(null)
+  const [apiKey, setApiKey] = useState("bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJQZXJtaXNzaW9ucyI6Ilt7XCJTZWN1cmFibGVPYmplY3RUeXBlXCI6MCxcIk9iamVjdElkXCI6XCI1ZWNkODJhZi05ZWI4LTQyODAtOGFlMS0yZjQ3ODI2ZTAyODBcIixcIlBlcm1pc3Npb25zXCI6MTIyNDgzNjUyNDY1NTI0MDY3MzEsXCJQZXJtaXNzaW9uczJcIjoxfSx7XCJTZWN1cmFibGVPYmplY3RUeXBlXCI6MSxcIk9iamVjdElkXCI6XCJiZDc5ODgxZC03ZGM4LTQ4ZjAtYWQ3Mi0wYTY5YzUxNjQyZGJcIixcIlBlcm1pc3Npb25zXCI6MTIyNDgzNjUyNDY1NTI0MDY3MzEsXCJQZXJtaXNzaW9uczJcIjoxfSx7XCJTZWN1cmFibGVPYmplY3RUeXBlXCI6OSxcIk9iamVjdElkXCI6XCJmZTBlODgxYy1jMjk2LTRlMDAtOWQ0OC1iZjE0NmFlYjc0MTFcIixcIlBlcm1pc3Npb25zXCI6MTIyNDgzNjUyNDY1NTI0MDY3MzEsXCJQZXJtaXNzaW9uczJcIjoxfV0iLCJVc2VyT3JnVW5pdElkIjoiXCJmZTBlODgxYy1jMjk2LTRlMDAtOWQ0OC1iZjE0NmFlYjc0MTFcIiIsIlVzZXJJZCI6IlwiODVlZjhlYTItMzQ0MS00OWE5LTg2ZjgtOTQ5NzVhYmI3MGNlXCIiLCJVc2VyTmFtZSI6ImVzcmlhdXN0cmFsaWFhZG1pbkBtZWRpYXZhbGV0Lm5ldCIsIlJvbGVJZCI6IlwiYWQ2ZmQwMzktYmI0OC00MDhmLWIyNDktOTc5Y2JmOTk4NmE3XCIiLCJFbWFpbCI6ImVzcmlhdXN0cmFsaWFhZG1pbkBtZWRpYXZhbGV0Lm5ldCIsIlNJZCI6IlwiYWQ2ZmQwMzktYmI0OC00MDhmLWIyNDktOTc5Y2JmOTk4NmE3XCIiLCJJcEFkZHJlc3MiOiIyMDkuNTMuMTguMjM0IiwiaXNzIjoiaHR0cDovL3d3dy5tZWRpYXZhbGV0aXNzdWVyLmNvbSIsImF1ZCI6Imh0dHA6Ly93d3cubWVkaWF2YWxldGF1ZGllbmNlLmNvbSIsImV4cCI6MTY1OTQyMDk3MiwibmJmIjoxNjU4ODE2MTcyfQ.mgStnDLFqlv0uw_591mOH3R2EUICj9O3BKTDp3r4cp26PsTJLHbqcRCyNbJaADxdrcliGA60MvdusB-_Z_R9XCYvYVM3rHM7PXjjR5KfoJASMkQ6iOIHHubCbhHueZGEOtvt3jRFrR5cDXRlp97pIDMhnjFJyUJRzbHVAYAG0WhWgQeC8xUVBxqWj-GoNntbvIs34CppRwRseIJ_W1x03qfKvwAQJZ3_jTmgXNwAL1wfNlGz5Ni2CDJj9Vv3kOFSc0ja7MIkd9m9PZWCjtArsPA-Cp5h6t9y7ylVtX8Q9IpoHZgjqU8G81ClRaHwlcXCEVekV5cv1l_6ZJFHOQD26A")
   const [isLoading, setIsLoading] = useState(true)
   const [cusattributes, setCusattributes] = useState([])
   const headers = {
@@ -21,7 +21,7 @@ const App = () => {
   const getApiKey = async () => {
     const url = 'https://identity-va.mediavalet.net/token'
     const headers = { 'content-type': 'application/json' }
-    const body = "grant_type=password&username=cbnadmin%40mediavalet.net&password=Z86AzGaEax634iy&client_id=421eaddf-08db-4866-86bb-936314687289"
+    const body = "grant_type=password&username=allenliadmin%40mediavalet.net&password=8Z9M7bR!&client_id=0cce9ca4-93a5-48a7-9e6a-29022fa16c51"
     const result = await axios.post(url, body, headers)
     setApiKey("bearer " + result.data.access_token)
   }
