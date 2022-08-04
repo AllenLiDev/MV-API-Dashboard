@@ -9,7 +9,7 @@ const App = () => {
   const [filteredAssets, setFilteredAssets] = useState([])
   const [cognitiveImageMetadata, setCognitiveImageMetadata] = useState([])
   const [cognitiveVideoMetadata, setCognitiveVideoMetadata] = useState([])
-  const [apiKey, setApiKey] = useState("bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJQZXJtaXNzaW9ucyI6Ilt7XCJTZWN1cmFibGVPYmplY3RUeXBlXCI6MCxcIk9iamVjdElkXCI6XCI1ZWNkODJhZi05ZWI4LTQyODAtOGFlMS0yZjQ3ODI2ZTAyODBcIixcIlBlcm1pc3Npb25zXCI6MTIyNDgzNjUyNDY1NTI0MDY3MzEsXCJQZXJtaXNzaW9uczJcIjoxfSx7XCJTZWN1cmFibGVPYmplY3RUeXBlXCI6MSxcIk9iamVjdElkXCI6XCJiZDc5ODgxZC03ZGM4LTQ4ZjAtYWQ3Mi0wYTY5YzUxNjQyZGJcIixcIlBlcm1pc3Npb25zXCI6MTIyNDgzNjUyNDY1NTI0MDY3MzEsXCJQZXJtaXNzaW9uczJcIjoxfSx7XCJTZWN1cmFibGVPYmplY3RUeXBlXCI6OSxcIk9iamVjdElkXCI6XCJmZTBlODgxYy1jMjk2LTRlMDAtOWQ0OC1iZjE0NmFlYjc0MTFcIixcIlBlcm1pc3Npb25zXCI6MTIyNDgzNjUyNDY1NTI0MDY3MzEsXCJQZXJtaXNzaW9uczJcIjoxfV0iLCJVc2VyT3JnVW5pdElkIjoiXCJmZTBlODgxYy1jMjk2LTRlMDAtOWQ0OC1iZjE0NmFlYjc0MTFcIiIsIlVzZXJJZCI6IlwiODVlZjhlYTItMzQ0MS00OWE5LTg2ZjgtOTQ5NzVhYmI3MGNlXCIiLCJVc2VyTmFtZSI6ImVzcmlhdXN0cmFsaWFhZG1pbkBtZWRpYXZhbGV0Lm5ldCIsIlJvbGVJZCI6IlwiYWQ2ZmQwMzktYmI0OC00MDhmLWIyNDktOTc5Y2JmOTk4NmE3XCIiLCJFbWFpbCI6ImVzcmlhdXN0cmFsaWFhZG1pbkBtZWRpYXZhbGV0Lm5ldCIsIlNJZCI6IlwiYWQ2ZmQwMzktYmI0OC00MDhmLWIyNDktOTc5Y2JmOTk4NmE3XCIiLCJJcEFkZHJlc3MiOiIyMDkuNTMuMTguMjM0IiwiaXNzIjoiaHR0cDovL3d3dy5tZWRpYXZhbGV0aXNzdWVyLmNvbSIsImF1ZCI6Imh0dHA6Ly93d3cubWVkaWF2YWxldGF1ZGllbmNlLmNvbSIsImV4cCI6MTY1OTQyMDk3MiwibmJmIjoxNjU4ODE2MTcyfQ.mgStnDLFqlv0uw_591mOH3R2EUICj9O3BKTDp3r4cp26PsTJLHbqcRCyNbJaADxdrcliGA60MvdusB-_Z_R9XCYvYVM3rHM7PXjjR5KfoJASMkQ6iOIHHubCbhHueZGEOtvt3jRFrR5cDXRlp97pIDMhnjFJyUJRzbHVAYAG0WhWgQeC8xUVBxqWj-GoNntbvIs34CppRwRseIJ_W1x03qfKvwAQJZ3_jTmgXNwAL1wfNlGz5Ni2CDJj9Vv3kOFSc0ja7MIkd9m9PZWCjtArsPA-Cp5h6t9y7ylVtX8Q9IpoHZgjqU8G81ClRaHwlcXCEVekV5cv1l_6ZJFHOQD26A")
+  const [apiKey, setApiKey] = useState()
   const [isLoading, setIsLoading] = useState(true)
   const [cusattributes, setCusattributes] = useState([])
   const headers = {
@@ -21,7 +21,8 @@ const App = () => {
   const getApiKey = async () => {
     const url = 'https://identity-va.mediavalet.net/token'
     const headers = { 'content-type': 'application/json' }
-    const body = "grant_type=password&username=allenliadmin%40mediavalet.net&password=8Z9M7bR!&client_id=0cce9ca4-93a5-48a7-9e6a-29022fa16c51"
+    // const body = "grant_type=password&username=allenliadmin%40mediavalet.net&password=8Z9M7bR!&client_id=0cce9ca4-93a5-48a7-9e6a-29022fa16c51"
+    const body = "grant_type=password&username=leadershiprigoradmin%40mediavalet.net&password=jJEUQGp4X4vO45tLI8&client_id=0b700e5a-b2e8-4963-ade4-18951be730ac"
     const result = await axios.post(url, body, headers)
     setApiKey("bearer " + result.data.access_token)
   }
@@ -79,7 +80,7 @@ const App = () => {
   }
 
   // get cognative metadata IMAGE
-  const getCognitiveImageMetadata = () => {
+  const getCognitiveImageMetadata = async () => {
     let promises = []
     let data = []
     for (let asset of assets) {
@@ -108,23 +109,64 @@ const App = () => {
   }
 
   // get cognative metadata IMAGE
-  const getCognitiveVideoMetadata = () => {
-    let promises = []
+  const getCognitiveVideoMetadata = async (offset) => {
     let data = []
-    for (let asset of assets) {
-      if (asset.media.type === 'Video') {
-        let tags = []
-        let confidences = []
-        let url = `https://mv-api-usva.mediavalet.net/assets/${asset.id}/autotags`
-        promises.push(
-          axios.get(url, { headers: headers })
-            .then(res => {
-              console.log(res)
-            })
-        )
-      }
+    let curAsset = assets[offset]
+    if (curAsset.media.type === 'Video') {
+      let url = `https://mv-api-usva.mediavalet.net/assets/${curAsset.id}/videoIntelligence/status`
+      let url2 = `https://mv-api-usva.mediavalet.net/assets/${curAsset.id}/videoIntelligence/insights`
+      await axios.get(url, { headers: headers })
+        .then(res => {
+          if (res.data.payload.Status === "Completed") {
+             axios.get(url2, { headers: headers })
+              .then(res => {
+                data.push({
+                  AssetId: curAsset.id,
+                  AssetName: curAsset.file.fileName,
+                  ...res.data.payload.insights
+                })
+              })
+            setCognitiveVideoMetadata(cognitiveVideoMetadata => [...cognitiveVideoMetadata, data])
+          }
+        })
     }
-    Promise.all(promises).then(() => setCognitiveVideoMetadata(data))
+    if (offset < assetCount) {
+      getCognitiveVideoMetadata((++offset))
+    }
+  }
+
+  const filterCognitiveVideoMetadata = () => {
+    let videoMeta = cognitiveVideoMetadata
+    let filteredMeta = []
+    for (let asset of videoMeta) {
+      let keywords = []
+      let labels = []
+      let topics = []
+      let faces = []
+      for (let keyword of asset[0].keywords) {
+        keywords.push(keyword.text)
+      }
+      for (let label of asset[0].labels) {
+        labels.push(label.text)
+      }
+      for (let topic of asset[0].topics) {
+        topics.push(topic.text)
+      }
+      for (let face of asset[0].faces) {
+        faces.push(face.text)
+      }
+
+      let filtered = {
+        AssetId: asset[0].AssetId,
+        Filename: asset[0].AssetName,
+        Keywords: keywords,
+        Labels: labels,
+        Topics: topics,
+        Faces: faces
+      }
+      filteredMeta.push(filtered)
+    }
+    setCognitiveVideoMetadata(filteredMeta)
   }
 
 
@@ -207,7 +249,7 @@ const App = () => {
         {cognitiveImageMetadata.length}
       </div>
       <div>
-        <button onClick={getCognitiveVideoMetadata}>Get Video Cognitive Metadata</button>
+        <button onClick={() => getCognitiveVideoMetadata(0)}>Get Video Cognitive Metadata</button>
         {cognitiveVideoMetadata.length}
       </div>
       <div>
@@ -215,10 +257,16 @@ const App = () => {
         {filteredAssets.length}
       </div>
       <div>
+        <button onClick={filterCognitiveVideoMetadata}>Filter Assets</button>
+      </div>
+      <div>
         <CSVLink data={filteredAssets}>Export Metadata</CSVLink>
       </div>
       <div>
         <CSVLink data={cognitiveImageMetadata}>Export CognitiveMetadata</CSVLink>
+      </div>
+      <div>
+        <CSVLink data={cognitiveVideoMetadata}>Export VIdeo CognitiveMetadata</CSVLink>
       </div>
     </div>
   );
