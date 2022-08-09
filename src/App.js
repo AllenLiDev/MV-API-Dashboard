@@ -21,8 +21,10 @@ const App = () => {
   const getApiKey = async () => {
     const url = 'https://identity-va.mediavalet.net/token'
     const headers = { 'content-type': 'application/json' }
+    const body = "grant_type=password&username=cbnadmin%40mediavalet.net&password=Z86AzGaEax634iy&client_id=421eaddf-08db-4866-86bb-936314687289"
     // const body = "grant_type=password&username=allenliadmin%40mediavalet.net&password=8Z9M7bR!&client_id=0cce9ca4-93a5-48a7-9e6a-29022fa16c51"
-    const body = "grant_type=password&username=leadershiprigoradmin%40mediavalet.net&password=jJEUQGp4X4vO45tLI8&client_id=0b700e5a-b2e8-4963-ade4-18951be730ac"
+    // const body = "grant_type=password&username=urbanstudionycadmin%40mediavalet.net&password=5lt47B09a762I6fD09O&client_id=1ad3463c-36cf-41a0-b99d-2e8105733b97"
+    // const body = "grant_type=password&username=leadershiprigoradmin%40mediavalet.net&password=jJEUQGp4X4vO45tLI8&client_id=0b700e5a-b2e8-4963-ade4-18951be730ac"
     const result = await axios.post(url, body, headers)
     setApiKey("bearer " + result.data.access_token)
   }
@@ -35,7 +37,8 @@ const App = () => {
       "count": 1,
       "offset": 0,
       "filters": "",
-      "sort": "record.createdAt D"
+      "sort": "record.createdAt D",
+      "containerfilter": "(CategoryIds/ANY(c: c EQ '41047a5f-1a9e-4807-9a87-323469c3307f') OR CategoryAncestorIds/ANY(c: c EQ '41047a5f-1a9e-4807-9a87-323469c3307f'))"
     }
     const result = await axios.post(url, data, { headers: headers })
     setAssetCount(result.data.payload.assetCount)
@@ -50,7 +53,8 @@ const App = () => {
       "count": 1000,
       "offset": offset,
       "filters": dateFilter,
-      "sort": "record.createdAt D"
+      "sort": "record.createdAt D",
+      "containerfilter": "(CategoryIds/ANY(c: c EQ '41047a5f-1a9e-4807-9a87-323469c3307f') OR CategoryAncestorIds/ANY(c: c EQ '41047a5f-1a9e-4807-9a87-323469c3307f'))"
     }
     const tempAssets = await axios.post(url, data, { headers: headers })
     setAssets(assets => [...assets, ...tempAssets.data.payload.assets])
@@ -249,7 +253,7 @@ const App = () => {
         {cognitiveImageMetadata.length}
       </div>
       <div>
-        <button onClick={() => getCognitiveVideoMetadata(0)}>Get Video Cognitive Metadata</button>
+        <button onClick={() => getCognitiveVideoMetadata(19000)}>Get Video Cognitive Metadata</button>
         {cognitiveVideoMetadata.length}
       </div>
       <div>
