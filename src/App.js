@@ -21,8 +21,9 @@ const App = () => {
   const getApiKey = async () => {
     const url = 'https://identity-va.mediavalet.net/token'
     const headers = { 'content-type': 'application/json' }
-    const body = "grant_type=password&username=cbnadmin%40mediavalet.net&password=Z86AzGaEax634iy&client_id=421eaddf-08db-4866-86bb-936314687289"
-    // const body = "grant_type=password&username=allenliadmin%40mediavalet.net&password=8Z9M7bR!&client_id=0cce9ca4-93a5-48a7-9e6a-29022fa16c51"
+    // const body = "grant_type=password&username=funimationadmin%40mediavalet.net&password=D9NtB7#&client_id=619f1b23-20ed-4360-bc61-7ee485ae0eb5"
+    // const body = "grant_type=password&username=nbcu-theiaadmin%40mediavalet.net&password=USe18UI4Ois1cC34vnD&client_id=f4283af4-0cc1-4e2b-a8ee-4acadbc7f183"
+    const body = "grant_type=password&username=allenliadmin%40mediavalet.net&password=8Z9M7bR!&client_id=0cce9ca4-93a5-48a7-9e6a-29022fa16c51"
     // const body = "grant_type=password&username=urbanstudionycadmin%40mediavalet.net&password=5lt47B09a762I6fD09O&client_id=1ad3463c-36cf-41a0-b99d-2e8105733b97"
     // const body = "grant_type=password&username=leadershiprigoradmin%40mediavalet.net&password=jJEUQGp4X4vO45tLI8&client_id=0b700e5a-b2e8-4963-ade4-18951be730ac"
     const result = await axios.post(url, body, headers)
@@ -37,8 +38,10 @@ const App = () => {
       "count": 1,
       "offset": 0,
       "filters": "",
+      // no expiry date assets
+      // "filters": "(DateExpired GT 9999-12-31T00:00:00.000Z)",
       "sort": "record.createdAt D",
-      "containerfilter": "(CategoryIds/ANY(c: c EQ '41047a5f-1a9e-4807-9a87-323469c3307f') OR CategoryAncestorIds/ANY(c: c EQ '41047a5f-1a9e-4807-9a87-323469c3307f'))"
+      // "containerfilter": "(CategoryIds/ANY(c: c EQ 'b9027229-a714-4634-94d8-72cb318879c5') OR CategoryAncestorIds/ANY(c: c EQ 'b9027229-a714-4634-94d8-72cb318879c5'))"
     }
     const result = await axios.post(url, data, { headers: headers })
     setAssetCount(result.data.payload.assetCount)
@@ -54,7 +57,7 @@ const App = () => {
       "offset": offset,
       "filters": dateFilter,
       "sort": "record.createdAt D",
-      "containerfilter": "(CategoryIds/ANY(c: c EQ '41047a5f-1a9e-4807-9a87-323469c3307f') OR CategoryAncestorIds/ANY(c: c EQ '41047a5f-1a9e-4807-9a87-323469c3307f'))"
+      // "containerfilter": "(CategoryIds/ANY(c: c EQ 'b9027229-a714-4634-94d8-72cb318879c5') OR CategoryAncestorIds/ANY(c: c EQ 'b9027229-a714-4634-94d8-72cb318879c5'))"
     }
     const tempAssets = await axios.post(url, data, { headers: headers })
     setAssets(assets => [...assets, ...tempAssets.data.payload.assets])
