@@ -10,10 +10,11 @@ const App = () => {
   const [filteredAssets, setFilteredAssets] = useState([])
   const [cognitiveImageMetadata, setCognitiveImageMetadata] = useState([])
   const [cognitiveVideoMetadata, setCognitiveVideoMetadata] = useState([])
+  const [cognitiveVideoIds, setCognitiveVideoIds] = useState([])
+  const [aviTokens, setAviTokens] = useState([])
   const [apiKey, setApiKey] = useState()
   const [isLoading, setIsLoading] = useState(true)
   const [cusattributes, setCusattributes] = useState([])
-  const [aviTokens, setAviTokens] = useState([])
   const headers = {
     'content-type': 'application/json',
     'authorization': apiKey
@@ -41,6 +42,8 @@ const App = () => {
       "count": 1,
       "offset": 0,
       "filters": "",
+      //  AVI FIlter
+      // "filters": "((AssetType EQ Video AND (videoIntelligence NE null AND videoIntelligence/videoIndexerId NE '')))",
       // no expiry date assets
       // "filters": "(DateExpired GT 9999-12-31T00:00:00.000Z)",
       "sort": "record.createdAt D",
@@ -59,7 +62,9 @@ const App = () => {
       "search": "",
       "count": 1000,
       "offset": offset,
-      "filters": dateFilter,
+      "filters": "",
+      //  AVI FIlter
+      // "filters": "((AssetType EQ Video AND (videoIntelligence NE null AND videoIntelligence/videoIndexerId NE '')))",
       "sort": "record.createdAt D",
       // "containerfilter": "(CategoryIds/ANY(c: c EQ 'b9027229-a714-4634-94d8-72cb318879c5') OR CategoryAncestorIds/ANY(c: c EQ 'b9027229-a714-4634-94d8-72cb318879c5'))"
     }
@@ -119,48 +124,83 @@ const App = () => {
     Promise.all(promises).then(() => setCognitiveImageMetadata(data))
   }
 
-  // get cognative metadata IMAGE
-  const getCognitiveVideoMetadata = async (offset) => {
-    // let data = []
+  // get cognative metadata Status
+  const getCognitiveVideoStatus = async (offset) => {
     let curAsset = assets[offset]
     if (curAsset.media.type === 'Video') {
-      // let url = `https://mv-api-usva.mediavalet.net/assets/${curAsset.id}/videoIntelligence/status`
-      // let url2 = `https://mv-api-usva.mediavalet.net/assets/${curAsset.id}/videoIntelligence/insights`
-      let url3 = `https://mv-api-usva.mediavalet.net/assets/${curAsset.id}/videoIntelligence/token`
-      // URL 1 and 2 call
-      // await axios.get(url, { headers: headers })
-      //   .then(res => {
-      //     if (res.data.payload.Status === "Completed") {
-      //        axios.get(url2, { headers: headers })
-      //         .then(res => {
-      //           data.push({
-      //             AssetId: curAsset.id,
-      //             AssetName: curAsset.file.fileName,
-      //             ...res.data.payload.insights
-      //           })
-      //         })
-      //       setCognitiveVideoMetadata(cognitiveVideoMetadata => [...cognitiveVideoMetadata, data])
-      //     }
-      //   })
-      await axios.get(url3, { headers: headers })
+      let url = `https://mv-api-usva.mediavalet.net/assets/${curAsset.id}/videoIntelligence/status`
+      // URL 1 for status
+      await axios.get(url, { headers: headers })
         .then(res => {
-          let tempToken = {
-            filename: curAsset.file.fileName,
-            accessToken: res.data.payload.accessToken,
-            location: res.data.payload.location,
-            videoIndexerAccountId: res.data.payload.videoIndexerAccountId,
-            videoIndexerId: res.data.payload.videoIndexerId
+          if (res.data.payload.Status === "Completed") {
+            let data = {
+              AssetId: curAsset.id,
+              AssetName: curAsset.file.fileName
+            }
+            setCognitiveVideoIds(cognitiveVideoIds => [...cognitiveVideoIds, data])
           }
-          setAviTokens(aviTokens => [...aviTokens, tempToken])
+        })
+        .catch(err => {
+          console.log(err, offset)
         })
     }
     if (offset < assetCount) {
+      getCognitiveVideoStatus((++offset))
+    }
+  }
+
+
+  // get cognative metadata Insight
+  const getCognitiveVideoMetadata = async (offset) => {
+    let curAsset = assets[offset]
+    let url2 = `https://mv-api-usva.mediavalet.net/assets/${curAsset.id}/videoIntelligence/insights`
+    // URL 2 insights (keywords) call
+    await axios.get(url2, { headers: headers })
+      .then(res => {
+        let data = {
+          AssetId: curAsset.id,
+          AssetName: curAsset.file.fileName,
+          keywords: res.data.payload.insights.keywords,
+          faces: res.data.payload.insights.faces,
+          labels: res.data.payload.insights.labels,
+          topics: res.data.payload.insights.topics
+        }
+        setCognitiveVideoMetadata(cognitiveVideoMetadata => [...cognitiveVideoMetadata, data])
+      })
+      .catch(err => {
+        console.log('no avi')
+      })
+    if (offset < assets.length) {
       getCognitiveVideoMetadata((++offset))
     }
   }
 
+  const getCognitiveToken = async (offset) => {
+    // url 3 for token
+    let curAsset = assets[offset]
+    let url3 = `https://mv-api-usva.mediavalet.net/assets/${curAsset.id}/videoIntelligence/token`
+    await axios.get(url3, { headers: headers })
+      .then(res => {
+        let tempToken = {
+          filename: curAsset.file.fileName,
+          accessToken: res.data.payload.accessToken,
+          location: res.data.payload.location,
+          videoIndexerAccountId: res.data.payload.videoIndexerAccountId,
+          videoIndexerId: res.data.payload.videoIndexerId
+        }
+        setAviTokens(aviTokens => [...aviTokens, tempToken])
+      })
+      .catch(err => {
+        console.log('no avi')
+      })
+    if (offset < assets.length) {
+      getCognitiveToken((++offset))
+    }
+  }
+
+
   const getAviTranscript = async (offset) => {
-    let {filename, accessToken, location, videoIndexerAccountId, videoIndexerId} = aviTokens[offset]
+    let { filename, accessToken, location, videoIndexerAccountId, videoIndexerId } = aviTokens[offset]
     let url = `https://api.videoindexer.ai/${location}/accounts/${videoIndexerAccountId}/videos/${videoIndexerId}/captions/?format=srt&includeAudioEffects=false&includeSpeakers=false&language=en-US`
     let aviHeaders = {
       'content-type': 'application/json',
@@ -168,7 +208,12 @@ const App = () => {
     }
     await axios.get(url, { headers: aviHeaders })
       .then(res => {
-        fileDownload(res.data, `${filename}.srt`)
+        if (res.data !== "") {
+          fileDownload(res.data, `${filename}.srt`)
+        }
+      })
+      .catch(err => {
+        console.log(err)
       })
     if (offset < aviTokens.length) {
       getAviTranscript((++offset))
@@ -183,22 +228,22 @@ const App = () => {
       let labels = []
       let topics = []
       let faces = []
-      for (let keyword of asset[0].keywords) {
+      for (let keyword of asset.keywords) {
         keywords.push(keyword.text)
       }
-      for (let label of asset[0].labels) {
+      for (let label of asset.labels) {
         labels.push(label.text)
       }
-      for (let topic of asset[0].topics) {
+      for (let topic of asset.topics) {
         topics.push(topic.text)
       }
-      for (let face of asset[0].faces) {
+      for (let face of asset.faces) {
         faces.push(face.text)
       }
 
       let filtered = {
-        AssetId: asset[0].AssetId,
-        Filename: asset[0].AssetName,
+        AssetId: asset.AssetId,
+        Filename: asset.AssetName,
         Keywords: keywords,
         Labels: labels,
         Topics: topics,
@@ -289,7 +334,15 @@ const App = () => {
         {cognitiveImageMetadata.length}
       </div>
       <div>
-        <button onClick={() => getCognitiveVideoMetadata(0)}>Get Video Cognitive Metadata</button>
+        <button onClick={() => getCognitiveVideoStatus(0)}>Get Video Cognitive Status</button>
+        {cognitiveVideoIds.length}
+      </div>
+      <div>
+        <button onClick={() => getCognitiveVideoMetadata(0)}>Get Video Cognitive Metadata - Insight</button>
+        {cognitiveVideoMetadata.length}
+      </div>
+      <div>
+        <button onClick={() => getCognitiveToken(0)}>Get Video Cognitive Token</button>
         {aviTokens.length}
       </div>
       <div>
@@ -300,7 +353,7 @@ const App = () => {
         {filteredAssets.length}
       </div>
       <div>
-        <button onClick={filterCognitiveVideoMetadata}>Filter Assets</button>
+        <button onClick={filterCognitiveVideoMetadata}>Filter AVI VIDEO Assets</button>
       </div>
       <div>
         <CSVLink data={filteredAssets}>Export Metadata</CSVLink>
