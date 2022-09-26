@@ -15,28 +15,38 @@ const App = () => {
   const [apiKey, setApiKey] = useState()
   const [isLoading, setIsLoading] = useState(true)
   const [cusattributes, setCusattributes] = useState([])
+  const [username, setUsername] = useState("allenliadmin%40mediavalet.net")
+  const [password, setPassword] = useState("8Z9M7bR!")
+  const [clientId, setClientId] = useState("0cce9ca4-93a5-48a7-9e6a-29022fa16c51")
+  const [apiUrl, setApiUrl] = useState("https://api-usva.mediavalet.net/")
+  const [authUrl, setAuthUrl] = useState('https://identity-va.mediavalet.net/')
   const headers = {
     'content-type': 'application/json',
     'authorization': apiKey
   }
 
+  // const body = "grant_type=password&username=funimationadmin%40mediavalet.net&password=D9NtB7#&client_id=619f1b23-20ed-4360-bc61-7ee485ae0eb5"
+  // const body = "grant_type=password&username=crunchyrolladmin%40mediavalet.net&password=4cHjcw4HUpL772sK&client_id=95e8535d-59b5-4163-940a-7455f87d4a6f"
+  // const body = "grant_type=password&username=texmedadmin@mediavalet.net&password=x29074Rt2bUE4CG61Kv&client_id=a778a755-b73f-4127-8a17-2ff805f424b5"
+  // const body = "grant_type=password&username=ffwagencyadmin%40mediavalet.net&password=DikjP2ab99lPQdBiRo24&client_id=718d9f18-70b1-41cf-851f-0b0d32f152f5"
+  // const body = "grant_type=password&username=mlseadmin%40mediavalet.net&password=GzJD9zDwwqPLR48&client_id=f72d94a8-82c6-4556-b418-abd299d72fb2"
+  // const body = "grant_type=password&username=nbcu-theiaadmin%40mediavalet.net&password=USe18UI4Ois1cC34vnD&client_id=f4283af4-0cc1-4e2b-a8ee-4acadbc7f183"
+  // const body = "grant_type=password&username=allenliadmin%40mediavalet.net&password=8Z9M7bR!&client_id=0cce9ca4-93a5-48a7-9e6a-29022fa16c51"
+  // const body = "grant_type=password&username=urbanstudionycadmin%40mediavalet.net&password=5lt47B09a762I6fD09O&client_id=1ad3463c-36cf-41a0-b99d-2e8105733b97"
+  // const body = "grant_type=password&username=leadershiprigoradmin%40mediavalet.net&password=jJEUQGp4X4vO45tLI8&client_id=0b700e5a-b2e8-4963-ade4-18951be730ac"
+
   // AUTHENTICATE
   const getApiKey = async () => {
-    const url = 'https://identity-va.mediavalet.net/token'
+    const url = `${authUrl}token`
     const headers = { 'content-type': 'application/json' }
-    // const body = "grant_type=password&username=ffwagencyadmin%40mediavalet.net&password=DikjP2ab99lPQdBiRo24&client_id=718d9f18-70b1-41cf-851f-0b0d32f152f5"
-    // const body = "grant_type=password&username=funimationadmin%40mediavalet.net&password=D9NtB7#&client_id=619f1b23-20ed-4360-bc61-7ee485ae0eb5"
-    // const body = "grant_type=password&username=nbcu-theiaadmin%40mediavalet.net&password=USe18UI4Ois1cC34vnD&client_id=f4283af4-0cc1-4e2b-a8ee-4acadbc7f183"
-    // const body = "grant_type=password&username=allenliadmin%40mediavalet.net&password=8Z9M7bR!&client_id=0cce9ca4-93a5-48a7-9e6a-29022fa16c51"
-    // const body = "grant_type=password&username=urbanstudionycadmin%40mediavalet.net&password=5lt47B09a762I6fD09O&client_id=1ad3463c-36cf-41a0-b99d-2e8105733b97"
-    const body = "grant_type=password&username=leadershiprigoradmin%40mediavalet.net&password=jJEUQGp4X4vO45tLI8&client_id=0b700e5a-b2e8-4963-ade4-18951be730ac"
+    const body = `grant_type=password&username=${username}&password=${password}&client_id=${clientId}`
     const result = await axios.post(url, body, headers)
     setApiKey("bearer " + result.data.access_token)
   }
 
   // TOTAL ASSET COUNT
   const getAssetCount = async () => {
-    const url = 'https://mv-api-usva.mediavalet.net/assets/search'
+    const url = `${apiUrl}assets/search`
     const data = {
       "search": "",
       "count": 1,
@@ -48,7 +58,7 @@ const App = () => {
       // "filters": "(DateExpired GT 9999-12-31T00:00:00.000Z)",
       "sort": "record.createdAt D",
       // category filter
-      // "containerfilter": "(CategoryIds/ANY(c: c EQ 'b9027229-a714-4634-94d8-72cb318879c5') OR CategoryAncestorIds/ANY(c: c EQ 'b9027229-a714-4634-94d8-72cb318879c5'))"
+      "containerfilter": "(CategoryIds/ANY(c: c EQ '5e2e47bf-b258-4a6e-a6f6-bbdb18ea3f8a'))"
     }
     const result = await axios.post(url, data, { headers: headers })
     setAssetCount(result.data.payload.assetCount)
@@ -56,8 +66,8 @@ const App = () => {
 
   // ITERATE OFFSET
   const getAssets = async (offset, dateFilter) => {
-    const url = 'https://mv-api-usva.mediavalet.net/assets/search'
-    // const url = `https://mv-api-usil.mediavalet.net/categories/aec0ba15-92bb-43d7-8095-ccf2662b1fec/assets?count=1000&offset=${offset}&sort=record.createdAt+D`
+    const url = `${apiUrl}assets/search`
+    // const url = `${apiUrl}categories/aec0ba15-92bb-43d7-8095-ccf2662b1fec/assets?count=1000&offset=${offset}&sort=record.createdAt+D`
     const data = {
       "search": "",
       "count": 1000,
@@ -66,26 +76,28 @@ const App = () => {
       //  AVI FIlter
       "filters": "((AssetType EQ Video AND (videoIntelligence NE null AND videoIntelligence/videoIndexerId NE '')))",
       "sort": "record.createdAt D",
-      // "containerfilter": "(CategoryIds/ANY(c: c EQ 'b9027229-a714-4634-94d8-72cb318879c5') OR CategoryAncestorIds/ANY(c: c EQ 'b9027229-a714-4634-94d8-72cb318879c5'))"
+      "containerfilter": "(CategoryIds/ANY(c: c EQ '5e2e47bf-b258-4a6e-a6f6-bbdb18ea3f8a'))"
     }
-    const tempAssets = await axios.post(url, data, { headers: headers })
-    setAssets(assets => [...assets, ...tempAssets.data.payload.assets])
-    if (assets < assetCount) {
-      // if offset greater thyepan 100k (azure limit)
-      if (offset >= 100000) {
-        dateFilter = ("DateUploaded LE " + tempAssets.data.payload.assets[999].createdAt)
-        getAssets(0, dateFilter)
-      } else {
-        offset += 1000
-        getAssets(offset, dateFilter)
-      }
-    }
+    await axios.post(url, data, { headers: headers })
+      .then((res) => {
+        setAssets(assets => [...assets, ...res.data.payload.assets])
+        // if offset greater thyepan 100k (azure limit)
+        if (offset < assetCount) {
+          if (offset >= 100000) {
+            dateFilter = ("DateUploaded LE " + res.data.payload.assets[999].createdAt)
+            getAssets(0, dateFilter)
+          } else {
+            offset += 1000
+            getAssets(offset, dateFilter)
+          }
+        }
+      })
   }
 
   // get custom attributes mapping
   const getCustomAttributes = () => {
     let tempAttributes = new Map();
-    const url = 'https://mv-api-usva.mediavalet.net/attributes'
+    const url = `${apiUrl}attributes`
     axios.get(url, { headers: headers })
       .then(res => {
         for (let attribute of res.data.payload) {
@@ -95,31 +107,44 @@ const App = () => {
       })
   }
 
+  // get category path from category ID
+  const getCategoryPath = () => {
+    const url = `${apiUrl}categories/c8fc93e1-b901-461b-8a2a-7c2f869a80e0`
+    axios.get(url, { headers: headers })
+      .then(res => {
+        console.log(res.data.payload.tree.path)
+      })
+  }
+
   // get cognative metadata IMAGE
   const getCognitiveImageMetadata = async () => {
     let promises = []
     let data = []
+    let count = 0
     for (let asset of assets) {
-      if (asset.media.type === 'Image') {
-        let tags = []
-        let confidences = []
-        let url = `https://mv-api-usva.mediavalet.net/assets/${asset.id}/autotags`
-        promises.push(
-          axios.get(url, { headers: headers })
-            .then(res => {
-              for (let tag in res.data.payload.tags) {
-                tags.push(res.data.payload.tags[tag].name)
-                confidences.push(res.data.payload.tags[tag].confidence)
-              }
-              let tempMetadata = {
-                AssetId: asset.id,
-                Tags: tags,
-                Confidence: confidences
-              }
-              data.push(tempMetadata)
-            })
-        )
+      if (count >= 9000 && count < 9999) {
+        if (asset.media.type === 'Image') {
+          let tags = []
+          let confidences = []
+          let url = `${apiUrl}assets/${asset.id}/autotags`
+          promises.push(
+            axios.get(url, { headers: headers })
+              .then(res => {
+                for (let tag in res.data.payload.tags) {
+                  tags.push(res.data.payload.tags[tag].name)
+                  confidences.push(res.data.payload.tags[tag].confidence)
+                }
+                let tempMetadata = {
+                  AssetId: asset.id,
+                  Tags: tags,
+                  Confidence: confidences
+                }
+                data.push(tempMetadata)
+              })
+          )
+        }
       }
+      count++
     }
     Promise.all(promises).then(() => setCognitiveImageMetadata(data))
   }
@@ -128,7 +153,7 @@ const App = () => {
   const getCognitiveVideoStatus = async (offset) => {
     let curAsset = assets[offset]
     if (curAsset.media.type === 'Video') {
-      let url = `https://mv-api-usva.mediavalet.net/assets/${curAsset.id}/videoIntelligence/status`
+      let url = `${apiUrl}assets/${curAsset.id}/videoIntelligence/status`
       // URL 1 for status
       await axios.get(url, { headers: headers })
         .then(res => {
@@ -153,7 +178,7 @@ const App = () => {
   // get cognative metadata Insight
   const getCognitiveVideoMetadata = async (offset) => {
     let curAsset = assets[offset]
-    let url2 = `https://mv-api-usva.mediavalet.net/assets/${curAsset.id}/videoIntelligence/insights`
+    let url2 = `${apiUrl}assets/${curAsset.id}/videoIntelligence/insights`
     // URL 2 insights (keywords) call
     await axios.get(url2, { headers: headers })
       .then(res => {
@@ -179,7 +204,7 @@ const App = () => {
   const getCognitiveToken = async (offset) => {
     // url 3 for token
     let curAsset = assets[offset]
-    let url3 = `https://mv-api-usva.mediavalet.net/assets/${curAsset.id}/videoIntelligence/token`
+    let url3 = `${apiUrl}assets/${curAsset.id}/videoIntelligence/token`
     await axios.get(url3, { headers: headers })
       .then(res => {
         let tempToken = {
@@ -285,7 +310,7 @@ const App = () => {
         UploadDate: new Date(asset.file.uploadedAt),
         UploadedBy: asset.record.createdBy.username,
         ExpiryDate: new Date(asset.file.expiresAt),
-        Versions: asset.record.version.version + 1,
+        Versions: asset.record.version.version,
         TotalViews: views
       }
       // custom attributes with mapping
@@ -300,6 +325,53 @@ const App = () => {
   useEffect(() => {
   }, [])
 
+
+  const handleUsernameChange = (e) => {
+    setUsername(e.target.value)
+  }
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value)
+  }
+  const handleClientIdChange = (e) => {
+    setClientId(e.target.value)
+  }
+  const handleDatacenterChange = (e) => {
+    switch (e.target.value) {
+      case 'usca':
+        setApiUrl('https://api-usca.mediavalet.net/')
+        setAuthUrl('https://identity-ca.mediavalet.net/')
+        break;
+      case 'usva':
+        setApiUrl('https://api-usva.mediavalet.net/')
+        setAuthUrl('https://identity-va.mediavalet.net/')
+        break;
+      case 'usva2':
+        setApiUrl('https://mv-api-usva2.mediavalet.net/')
+        setAuthUrl('https://mv-identity-usva2.mediavalet.net/')
+        break;
+      case 'usil':
+        setApiUrl('https://api-usil.mediavalet.net/')
+        setAuthUrl('https://identity-il.mediavalet.net/')
+        break;
+      case 'cato':
+        setApiUrl('https://api-cato.mediavalet.net/')
+        setAuthUrl('https://identity-cato.mediavalet.net/')
+        break;
+      case 'whistler':
+        setApiUrl('https://mv-api-whistler.mediavalet.net/')
+        setAuthUrl('https://mv-identity-whistler.mediavalet.net/')
+        break;
+      case 'eunl':
+        setApiUrl('https://api-eunl.mediavalet.net/')
+        setAuthUrl('https://identity-eu.mediavalet.net/')
+        break;
+      case 'aunsw':
+        setApiUrl('https://mv-api-aunsw.mediavalet.net/')
+        setAuthUrl('https://mv-identity-aunsw.mediavalet.net/')
+        break;
+    }
+  }
+
   // render assets as component
   // const AssetComponent = ({ assets }) => {
   //   <div>
@@ -311,10 +383,57 @@ const App = () => {
   // }
   return (
     <div className="App">
+      <form>
+        <label>
+          Username
+          <input
+            name="Username"
+            type="text"
+            onChange={handleUsernameChange} />
+        </label>
+        <br />
+        <label>
+          Password
+          <input
+            name="Password"
+            type="password"
+            onChange={handlePasswordChange} />
+        </label>
+        <br />
+        <label>
+          Client Id
+          <input
+            name="Client id"
+            type="text"
+            onChange={handleClientIdChange} />
+        </label>
+        <br />
+        <label>Data Center:</label>
+        <select name="DC" id="Data Centers" onChange={handleDatacenterChange}>
+          <optgroup label="USA">
+            <option value="usca">USCA</option>
+            <option value="usva">USVA</option>
+            <option value="usva2">USVA2</option>
+            <option value="usil">USIL</option>
+          </optgroup>
+          <optgroup label="Canada">
+            <option value="cato">CATO</option>
+            <option value="whistler">Whistler</option>
+          </optgroup>
+          <optgroup label="Europe">
+            <option value="eunl">EUNL</option>
+          </optgroup>
+          <optgroup label="Australia">
+            <option value="aunsw">AUNSW</option>
+          </optgroup>
+        </select>
+      </form>
+      <br />
       <div>
         <button onClick={getApiKey}>Authenticate</button>
         API KEY Set? {apiKey ? "Yes" : "No"}
       </div>
+      <br />
       <div>
         <button onClick={getAssetCount}>Get Total Number of Assets</button>
         Total number of assets: {assetCount}
@@ -332,9 +451,24 @@ const App = () => {
         Attribute Mapping Count: {cusattributes.size}
       </div>
       <div>
+        <button onClick={filterAssets}>Filter Assets</button>
+        {filteredAssets.length}
+      </div>
+      <div>
+        <button onClick={getCategoryPath}>Get Category Paths</button>
+      </div>
+      <div>
+      <CSVLink data={filteredAssets}>Export Metadata</CSVLink>
+      </div>
+      <br />
+      <div>
         <button onClick={getCognitiveImageMetadata}>Get Image Cognitive Metadata</button>
         {cognitiveImageMetadata.length}
       </div>
+      <div>
+        <CSVLink data={cognitiveImageMetadata}>Export Image Cognitive Metadata</CSVLink>
+      </div>
+      <br />
       <div>
         <button onClick={() => getCognitiveVideoStatus(0)}>Get Video Cognitive Status</button>
         {cognitiveVideoIds.length}
@@ -351,20 +485,10 @@ const App = () => {
         <button onClick={() => getAviTranscript(0)}>Get Video Cognitive Transcript</button>
       </div>
       <div>
-        <button onClick={filterAssets}>Filter Assets</button>
-        {filteredAssets.length}
-      </div>
-      <div>
         <button onClick={filterCognitiveVideoMetadata}>Filter AVI VIDEO Assets</button>
       </div>
       <div>
-        <CSVLink data={filteredAssets}>Export Metadata</CSVLink>
-      </div>
-      <div>
-        <CSVLink data={cognitiveImageMetadata}>Export CognitiveMetadata</CSVLink>
-      </div>
-      <div>
-        <CSVLink data={cognitiveVideoMetadata}>Export VIdeo CognitiveMetadata</CSVLink>
+        <CSVLink data={cognitiveVideoMetadata}>Export Video CognitiveMetadata</CSVLink>
       </div>
     </div>
   );
