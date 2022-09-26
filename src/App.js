@@ -43,7 +43,7 @@ const App = () => {
       "offset": 0,
       "filters": "",
       //  AVI FIlter
-      // "filters": "((AssetType EQ Video AND (videoIntelligence NE null AND videoIntelligence/videoIndexerId NE '')))",
+      "filters": "((AssetType EQ Video AND (videoIntelligence NE null AND videoIntelligence/videoIndexerId NE '')))",
       // no expiry date assets
       // "filters": "(DateExpired GT 9999-12-31T00:00:00.000Z)",
       "sort": "record.createdAt D",
@@ -62,9 +62,9 @@ const App = () => {
       "search": "",
       "count": 1000,
       "offset": offset,
-      "filters": "",
+      "filters": dateFilter,
       //  AVI FIlter
-      // "filters": "((AssetType EQ Video AND (videoIntelligence NE null AND videoIntelligence/videoIndexerId NE '')))",
+      "filters": "((AssetType EQ Video AND (videoIntelligence NE null AND videoIntelligence/videoIndexerId NE '')))",
       "sort": "record.createdAt D",
       // "containerfilter": "(CategoryIds/ANY(c: c EQ 'b9027229-a714-4634-94d8-72cb318879c5') OR CategoryAncestorIds/ANY(c: c EQ 'b9027229-a714-4634-94d8-72cb318879c5'))"
     }
@@ -160,6 +160,7 @@ const App = () => {
         let data = {
           AssetId: curAsset.id,
           AssetName: curAsset.file.fileName,
+          Category: curAsset.categories,
           keywords: res.data.payload.insights.keywords,
           faces: res.data.payload.insights.faces,
           labels: res.data.payload.insights.labels,
@@ -244,6 +245,7 @@ const App = () => {
       let filtered = {
         AssetId: asset.AssetId,
         Filename: asset.AssetName,
+        CategoryId: asset.Category,
         Keywords: keywords,
         Labels: labels,
         Topics: topics,
