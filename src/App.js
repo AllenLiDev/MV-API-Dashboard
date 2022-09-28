@@ -20,6 +20,7 @@ const App = () => {
   const [clientId, setClientId] = useState("0cce9ca4-93a5-48a7-9e6a-29022fa16c51")
   const [apiUrl, setApiUrl] = useState("https://api-usva.mediavalet.net/")
   const [authUrl, setAuthUrl] = useState('https://identity-va.mediavalet.net/')
+  const [users, setUsers] = useState([])
   const headers = {
     'content-type': 'application/json',
     'authorization': apiKey
@@ -57,8 +58,10 @@ const App = () => {
       // no expiry date assets
       // "filters": "(DateExpired GT 9999-12-31T00:00:00.000Z)",
       "sort": "record.createdAt D",
-      // category filter
-      "containerfilter": "(CategoryIds/ANY(c: c EQ '5e2e47bf-b258-4a6e-a6f6-bbdb18ea3f8a'))"
+      // category filter current cat without nested
+      // "containerfilter": "(CategoryIds/ANY(c: c EQ '5e2e47bf-b258-4a6e-a6f6-bbdb18ea3f8a'))"
+      // category filter with nested
+      // "containerfilter": "(CategoryIds/ANY(c: c EQ '60644df3-e473-47cd-af23-2700cb275f34') OR CategoryAncestorIds/ANY(c: c EQ '60644df3-e473-47cd-af23-2700cb275f34'))"
     }
     const result = await axios.post(url, data, { headers: headers })
     setAssetCount(result.data.payload.assetCount)
@@ -76,7 +79,10 @@ const App = () => {
       //  AVI FIlter
       // "filters": "((AssetType EQ Video AND (videoIntelligence NE null AND videoIntelligence/videoIndexerId NE '')))",
       "sort": "record.createdAt D",
-      "containerfilter": "(CategoryIds/ANY(c: c EQ '5e2e47bf-b258-4a6e-a6f6-bbdb18ea3f8a'))"
+      // "containerfilter": "(CategoryIds/ANY(c: c EQ '5e2e47bf-b258-4a6e-a6f6-bbdb18ea3f8a'))"
+      // category filter with nested
+      // "containerfilter": "(CategoryIds/ANY(c: c EQ '60644df3-e473-47cd-af23-2700cb275f34') OR CategoryAncestorIds/ANY(c: c EQ '60644df3-e473-47cd-af23-2700cb275f34'))"
+
     }
     await axios.post(url, data, { headers: headers })
       .then((res) => {
@@ -113,6 +119,15 @@ const App = () => {
     axios.get(url, { headers: headers })
       .then(res => {
         console.log(res.data.payload.tree.path)
+      })
+  }
+
+  // gets users 
+  const getUsers = () => {
+    const url = `${apiUrl}users`
+    axios.get(url, { headers: headers })
+      .then(res => {
+        setUsers(res.data.payload.users)
       })
   }
 
@@ -456,7 +471,15 @@ const App = () => {
         <button onClick={getCategoryPath}>Get Category Paths</button>
       </div>
       <div>
-      <CSVLink data={filteredAssets}>Export Metadata</CSVLink>
+        <CSVLink data={filteredAssets}>Export Metadata</CSVLink>
+      </div>
+      <br />
+      <div>
+        <button onClick={getUsers}>Get Users</button>
+        Users: {users.length}
+      </div>
+      <div>
+        <CSVLink data={users}>Export Users</CSVLink>
       </div>
       <br />
       <div>
