@@ -52,7 +52,7 @@ const App = () => {
       "search": "",
       "count": 1,
       "offset": 0,
-      "filters": "",
+      "filters": "(FileExtension EQ 'XML')",
       //  AVI FIlter
       // "filters": "((AssetType EQ Video AND (videoIntelligence NE null AND videoIntelligence/videoIndexerId NE '')))",
       // no expiry date assets
@@ -61,7 +61,7 @@ const App = () => {
       // category filter current cat without nested
       // "containerfilter": "(CategoryIds/ANY(c: c EQ '5e2e47bf-b258-4a6e-a6f6-bbdb18ea3f8a'))"
       // category filter with nested
-      // "containerfilter": "(CategoryIds/ANY(c: c EQ '60644df3-e473-47cd-af23-2700cb275f34') OR CategoryAncestorIds/ANY(c: c EQ '60644df3-e473-47cd-af23-2700cb275f34'))"
+      // "containerfilter": "(CategoryIds/ANY(c: c EQ 'eb7ed8c7-8379-423d-bad8-c61061113c67') OR CategoryAncestorIds/ANY(c: c EQ 'eb7ed8c7-8379-423d-bad8-c61061113c67'))"
     }
     const result = await axios.post(url, data, { headers: headers })
     setAssetCount(result.data.payload.assetCount)
@@ -74,14 +74,16 @@ const App = () => {
     const data = {
       "search": "",
       "count": 1000,
-      "offset": offset,
-      "filters": dateFilter,
+      "offset": offset, 
+      "filters": (dateFilter === undefined) ? "((FileExtension EQ 'XML'))" : "(" + dateFilter + " AND (FileExtension EQ 'XML'))",
       //  AVI FIlter
       // "filters": "((AssetType EQ Video AND (videoIntelligence NE null AND videoIntelligence/videoIndexerId NE '')))",
+      // filter filetype
+      // filters: "((FileExtension EQ 'XML'))",
       "sort": "record.createdAt D",
       // "containerfilter": "(CategoryIds/ANY(c: c EQ '5e2e47bf-b258-4a6e-a6f6-bbdb18ea3f8a'))"
       // category filter with nested
-      // "containerfilter": "(CategoryIds/ANY(c: c EQ '60644df3-e473-47cd-af23-2700cb275f34') OR CategoryAncestorIds/ANY(c: c EQ '60644df3-e473-47cd-af23-2700cb275f34'))"
+      // "containerfilter": "(CategoryIds/ANY(c: c EQ 'eb7ed8c7-8379-423d-bad8-c61061113c67') OR CategoryAncestorIds/ANY(c: c EQ 'eb7ed8c7-8379-423d-bad8-c61061113c67'))"
 
     }
     await axios.post(url, data, { headers: headers })
