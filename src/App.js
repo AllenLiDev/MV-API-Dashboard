@@ -20,6 +20,8 @@ const App = () => {
   const [clientId, setClientId] = useState("0cce9ca4-93a5-48a7-9e6a-29022fa16c51")
   const [apiUrl, setApiUrl] = useState("https://api-usva.mediavalet.net/")
   const [authUrl, setAuthUrl] = useState('https://identity-va.mediavalet.net/')
+  const [users, setUsers] = useState([])
+  const [xmpMetadata, setXmpMetadata] = useState([])
   const headers = {
     'content-type': 'application/json',
     'authorization': apiKey
@@ -51,14 +53,18 @@ const App = () => {
       "search": "",
       "count": 1,
       "offset": 0,
-      "filters": "",
+      // "filters": "",
+      // fle extenson
+      "filters": "(FileExtension EQ 'XML')",
       //  AVI FIlter
       "filters": "((AssetType EQ Video AND (videoIntelligence NE null AND videoIntelligence/videoIndexerId NE '')))",
       // no expiry date assets
       // "filters": "(DateExpired GT 9999-12-31T00:00:00.000Z)",
       "sort": "record.createdAt D",
-      // category filter
-      "containerfilter": "(CategoryIds/ANY(c: c EQ '5e2e47bf-b258-4a6e-a6f6-bbdb18ea3f8a'))"
+      // category filter current cat without nested
+      // "containerfilter": "(CategoryIds/ANY(c: c EQ '5e2e47bf-b258-4a6e-a6f6-bbdb18ea3f8a'))"
+      // category filter with nested
+      // "containerfilter": "(CategoryIds/ANY(c: c EQ 'eb7ed8c7-8379-423d-bad8-c61061113c67') OR CategoryAncestorIds/ANY(c: c EQ 'eb7ed8c7-8379-423d-bad8-c61061113c67'))"
     }
     const result = await axios.post(url, data, { headers: headers })
     setAssetCount(result.data.payload.assetCount)
@@ -72,11 +78,17 @@ const App = () => {
       "search": "",
       "count": 1000,
       "offset": offset,
-      "filters": dateFilter,
+      // "filters": dateFilter,
+      // "filters": (dateFilter === undefined) ? "((FileExtension EQ 'XML'))" : "(" + dateFilter + " AND (FileExtension EQ 'XML'))",
       //  AVI FIlter
-      "filters": "((AssetType EQ Video AND (videoIntelligence NE null AND videoIntelligence/videoIndexerId NE '')))",
+      // "filters": "((AssetType EQ Video AND (videoIntelligence NE null AND videoIntelligence/videoIndexerId NE '')))",
+      // filter filetype
+      filters: "((FileExtension EQ 'XML'))",
       "sort": "record.createdAt D",
-      "containerfilter": "(CategoryIds/ANY(c: c EQ '5e2e47bf-b258-4a6e-a6f6-bbdb18ea3f8a'))"
+      // "containerfilter": "(CategoryIds/ANY(c: c EQ '5e2e47bf-b258-4a6e-a6f6-bbdb18ea3f8a'))"
+      // category filter with nested
+      // "containerfilter": "(CategoryIds/ANY(c: c EQ 'eb7ed8c7-8379-423d-bad8-c61061113c67') OR CategoryAncestorIds/ANY(c: c EQ 'eb7ed8c7-8379-423d-bad8-c61061113c67'))"
+
     }
     await axios.post(url, data, { headers: headers })
       .then((res) => {
@@ -113,6 +125,15 @@ const App = () => {
     axios.get(url, { headers: headers })
       .then(res => {
         console.log(res.data.payload.tree.path)
+      })
+  }
+
+  // gets users 
+  const getUsers = () => {
+    const url = `${apiUrl}users`
+    axios.get(url, { headers: headers })
+      .then(res => {
+        setUsers(res.data.payload.users)
       })
   }
 
@@ -322,6 +343,36 @@ const App = () => {
     setFilteredAssets(tempFilteredAssets)
   }
 
+  const getXmpMetadata = async () => {
+    for (let count = 10000; count < assetCount; count++) {
+      const url = `${apiUrl}assets/${assets[count].id}/xmp`
+      await axios.get(url, { headers: headers })
+        .then((res) => {
+          setXmpMetadata(xmpMetadata => [
+            ...xmpMetadata,
+            {
+              assetId: assets[count].id,
+              assetType: res.data.payload[0].propertyValue,
+              metadataCredit: res.data.payload[6].propertyValue,
+              dateCreate: res.data.payload[7].propertyValue,
+              dateInput: res.data.payload[8].propertyValue,
+              doNotUseImage: res.data.payload[9].propertyValue,
+              expirationDate: res.data.payload[11].propertyValue,
+              imageKind: res.data.payload[13].propertyValue,
+              keyword: res.data.payload[17].propertyValue,
+              library: res.data.payload[18].propertyValue,
+              merlinId: res.data.payload[24].propertyValue,
+              modality: res.data.payload[25].propertyValue,
+              objectAssetId: res.data.payload[27].propertyValue,
+            }
+          ])
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    }
+  }
+
   useEffect(() => {
   }, [])
 
@@ -458,7 +509,15 @@ const App = () => {
         <button onClick={getCategoryPath}>Get Category Paths</button>
       </div>
       <div>
-      <CSVLink data={filteredAssets}>Export Metadata</CSVLink>
+        <CSVLink data={filteredAssets}>Export Metadata</CSVLink>
+      </div>
+      <br />
+      <div>
+        <button onClick={getUsers}>Get Users</button>
+        Users: {users.length}
+      </div>
+      <div>
+        <CSVLink data={users}>Export Users</CSVLink>
       </div>
       <br />
       <div>
@@ -489,6 +548,14 @@ const App = () => {
       </div>
       <div>
         <CSVLink data={cognitiveVideoMetadata}>Export Video CognitiveMetadata</CSVLink>
+      </div>
+      <br />
+      <div>
+        <button onClick={getXmpMetadata}>get XMP Metadata</button>
+        {xmpMetadata.length}
+      </div>
+      <div>
+        <CSVLink data={xmpMetadata}>Export XMP Metadata</CSVLink>
       </div>
     </div>
   );
