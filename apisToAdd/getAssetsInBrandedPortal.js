@@ -1,0 +1,17 @@
+const request = require('request');
+// add /portalid/sectionid/
+let options = {
+    'method': 'GET',
+    'url': 'https://mv-api-usil.mediavalet.net/brandedportals/14e24d36-4d5b-4d91-a0d9-9c025c563919/assets',
+    'headers': {
+        'content-type': 'application/json',
+        'Authorization': 'bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJQZXJtaXNzaW9ucyI6Ilt7XCJTZWN1cmFibGVPYmplY3RUeXBlXCI6MCxcIk9iamVjdElkXCI6XCI1ZmJhNDRjNS1mZjFiLTQ3MjItOTRlZS0zY2FmMDgzMmRjOWZcIixcIlBlcm1pc3Npb25zXCI6MzAyNDk5MzIwOTY5NzYzMDkyMyxcIlBlcm1pc3Npb25zMlwiOjF9LHtcIlNlY3VyYWJsZU9iamVjdFR5cGVcIjoxLFwiT2JqZWN0SWRcIjpcImEyNTQ2OTlhLWE5NjUtNGEwNC1hNjViLTdmYzU2MTk4Y2Y2ZVwiLFwiUGVybWlzc2lvbnNcIjozMDI0OTkzMjA5Njk3NjMwOTIzLFwiUGVybWlzc2lvbnMyXCI6MX0se1wiU2VjdXJhYmxlT2JqZWN0VHlwZVwiOjksXCJPYmplY3RJZFwiOlwiYWExYzhjMWYtYjRhOS00ZmJiLWJmYzctZWVlYmFjYTY3YzJlXCIsXCJQZXJtaXNzaW9uc1wiOjMwMjQ5OTMyMDk2OTc2MzA5MjMsXCJQZXJtaXNzaW9uczJcIjoxfV0iLCJVc2VyT3JnVW5pdElkIjoiXCJhYTFjOGMxZi1iNGE5LTRmYmItYmZjNy1lZWViYWNhNjdjMmVcIiIsIlVzZXJJZCI6IlwiYjU4YTZlMWItYjMwYS00NTFmLTgyZjgtNmVjYjgyOWJjODczXCIiLCJVc2VyTmFtZSI6ImNoZW1vdXJzYWRtaW5AbWVkaWF2YWxldC5uZXQiLCJSb2xlSWQiOiJcImE5MTM3ZDdmLTY0MjktNDM4My1hZGM3LWJmYWQ5YWJjYTlmMFwiIiwiRW1haWwiOiJjaGVtb3Vyc2FkbWluQG1lZGlhdmFsZXQubmV0IiwiU0lkIjoiXCJhOTEzN2Q3Zi02NDI5LTQzODMtYWRjNy1iZmFkOWFiY2E5ZjBcIiIsIklwQWRkcmVzcyI6IjIwNy44MS4yNTEuNyIsImlzcyI6Imh0dHA6Ly93d3cubWVkaWF2YWxldGlzc3Vlci5jb20iLCJhdWQiOiJodHRwOi8vd3d3Lm1lZGlhdmFsZXRhdWRpZW5jZS5jb20iLCJleHAiOjE2NDA3MTI1NzIsIm5iZiI6MTY0MDEwNzc3Mn0.HuEnDpNHCr0RZy4jE3n4XkRT3lNcydE78qbkl1N-9Oml8dK5l3R6V4Pz30jYmLRjFNCSBbOTENCm9jd3A2wzz6dQqCJIvi0EYHMyQyONm1yO273VpdHHM1QaDRQwIEhDP70TvB7AabOxC0z06xE4bsApZ4Nnu687VxKwMsFwW3TdY3NvbbYVj-HlO2Uf29jgU2l3mSnXTtJVaoFajUECZrbgbx_ALkZ73tKzfa_Ku_Fkrf9-IWHzgl_UcQ3c40gNqplbP3hWaPxjHmewt7wW6VK7QO8orj_AdwdyDDZquEwjYpv2a3paVbvKWvCjsL0MwqMVDCc6vUAL1DCTcLVy1Q'    }
+};
+
+request(options, function (error, response) {
+    if (error) throw new Error(error);
+    let assets = JSON.parse(response.body).payload.assets;
+    for(asset of assets) {
+        console.log(asset.id)
+    }
+});

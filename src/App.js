@@ -27,16 +27,6 @@ const App = () => {
     'authorization': apiKey
   }
 
-  // const body = "grant_type=password&username=funimationadmin%40mediavalet.net&password=D9NtB7#&client_id=619f1b23-20ed-4360-bc61-7ee485ae0eb5"
-  // const body = "grant_type=password&username=crunchyrolladmin%40mediavalet.net&password=4cHjcw4HUpL772sK&client_id=95e8535d-59b5-4163-940a-7455f87d4a6f"
-  // const body = "grant_type=password&username=texmedadmin@mediavalet.net&password=x29074Rt2bUE4CG61Kv&client_id=a778a755-b73f-4127-8a17-2ff805f424b5"
-  // const body = "grant_type=password&username=ffwagencyadmin%40mediavalet.net&password=DikjP2ab99lPQdBiRo24&client_id=718d9f18-70b1-41cf-851f-0b0d32f152f5"
-  // const body = "grant_type=password&username=mlseadmin%40mediavalet.net&password=GzJD9zDwwqPLR48&client_id=f72d94a8-82c6-4556-b418-abd299d72fb2"
-  // const body = "grant_type=password&username=nbcu-theiaadmin%40mediavalet.net&password=USe18UI4Ois1cC34vnD&client_id=f4283af4-0cc1-4e2b-a8ee-4acadbc7f183"
-  // const body = "grant_type=password&username=allenliadmin%40mediavalet.net&password=8Z9M7bR!&client_id=0cce9ca4-93a5-48a7-9e6a-29022fa16c51"
-  // const body = "grant_type=password&username=urbanstudionycadmin%40mediavalet.net&password=5lt47B09a762I6fD09O&client_id=1ad3463c-36cf-41a0-b99d-2e8105733b97"
-  // const body = "grant_type=password&username=leadershiprigoradmin%40mediavalet.net&password=jJEUQGp4X4vO45tLI8&client_id=0b700e5a-b2e8-4963-ade4-18951be730ac"
-
   // AUTHENTICATE
   const getApiKey = async () => {
     const url = `${authUrl}token`
@@ -53,9 +43,9 @@ const App = () => {
       "search": "",
       "count": 1,
       "offset": 0,
-      // "filters": "",
+      "filters": "",
       // fle extenson
-      "filters": "(FileExtension EQ 'XML')",
+      // "filters": "(FileExtension EQ 'XML')",
       //  AVI FIlter
       // "filters": "((AssetType EQ Video AND (videoIntelligence NE null AND videoIntelligence/videoIndexerId NE '')))",
       // no expiry date assets
@@ -78,12 +68,12 @@ const App = () => {
       "search": "",
       "count": 1000,
       "offset": offset,
-      // "filters": dateFilter,
+      "filters": dateFilter,
       // "filters": (dateFilter === undefined) ? "((FileExtension EQ 'XML'))" : "(" + dateFilter + " AND (FileExtension EQ 'XML'))",
       //  AVI FIlter
       // "filters": "((AssetType EQ Video AND (videoIntelligence NE null AND videoIntelligence/videoIndexerId NE '')))",
       // filter filetype
-      filters: "((FileExtension EQ 'XML'))",
+      // filters: "((FileExtension EQ 'XML'))",
       "sort": "record.createdAt D",
       // "containerfilter": "(CategoryIds/ANY(c: c EQ '5e2e47bf-b258-4a6e-a6f6-bbdb18ea3f8a'))"
       // category filter with nested
