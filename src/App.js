@@ -47,12 +47,12 @@ const App = () => {
       // fle extenson
       // "filters": "(FileExtension EQ 'XML')",
       //  AVI FIlter
-      "filters": "((AssetType EQ Video AND (videoIntelligence NE null AND videoIntelligence/videoIndexerId NE '')))",
+      // "filters": "((AssetType EQ Video AND (videoIntelligence NE null AND videoIntelligence/videoIndexerId NE '')))",
       // no expiry date assets
       // "filters": "(DateExpired GT 9999-12-31T00:00:00.000Z)",
       "sort": "record.createdAt D",
       // category filter current cat without nested
-      // "containerfilter": "(CategoryIds/ANY(c: c EQ '5e2e47bf-b258-4a6e-a6f6-bbdb18ea3f8a'))"
+      // "containerfilter": "(CategoryIds/ANY(c: c EQ 'c600bca5-fd27-46af-9857-1a4c4bf91f2b'))"
       // category filter with nested
       // "containerfilter": "(CategoryIds/ANY(c: c EQ 'eb7ed8c7-8379-423d-bad8-c61061113c67') OR CategoryAncestorIds/ANY(c: c EQ 'eb7ed8c7-8379-423d-bad8-c61061113c67'))"
     }
@@ -75,7 +75,7 @@ const App = () => {
       // filter filetype
       // filters: "((FileExtension EQ 'XML'))",
       "sort": "record.createdAt D",
-      // "containerfilter": "(CategoryIds/ANY(c: c EQ '5e2e47bf-b258-4a6e-a6f6-bbdb18ea3f8a'))"
+      // "containerfilter": "(CategoryIds/ANY(c: c EQ 'c600bca5-fd27-46af-9857-1a4c4bf91f2b'))"
       // category filter with nested
       // "containerfilter": "(CategoryIds/ANY(c: c EQ 'eb7ed8c7-8379-423d-bad8-c61061113c67') OR CategoryAncestorIds/ANY(c: c EQ 'eb7ed8c7-8379-423d-bad8-c61061113c67'))"
 
@@ -125,6 +125,10 @@ const App = () => {
       .then(res => {
         setUsers(res.data.payload.users)
       })
+  }
+
+  const storeToTemp = () => {
+    localStorage.setItem('tempMeta', JSON.stringify(assets));
   }
 
   // get cognative metadata IMAGE
@@ -496,8 +500,11 @@ const App = () => {
         {filteredAssets.length}
       </div>
       <div>
-        <button onClick={getCategoryPath}>Get Category Paths</button>
+        <button onClick={storeToTemp}>Store To Local</button>
       </div>
+      {/* <div>
+        <button onClick={getCategoryPath}>Get Category Paths</button>
+      </div> */}
       <div>
         <CSVLink data={filteredAssets}>Export Metadata</CSVLink>
       </div>
