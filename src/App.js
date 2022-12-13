@@ -48,13 +48,15 @@ const App = () => {
       // "filters": "(FileExtension EQ 'XML')",
       //  AVI FIlter
       // "filters": "((AssetType EQ Video AND (videoIntelligence NE null AND videoIntelligence/videoIndexerId NE '')))",
+      // "filters": "(((DateSoftDeleted GE 2022-08-30T00:00:00.000Z AND DateSoftDeleted LE 2022-11-28T23:59:59.000Z) AND Status EQ 10))",
+      // "includeSoftDeleted": true,
       // no expiry date assets
-      // "filters": "(DateExpired GT 9999-12-31T00:00:00.000Z)",
-      "sort": "record.createdAt D",
+      // "filters": "((DateExpired GE 2023-01-01T00:00:00.000Z AND DateExpired LE 2023-03-31T23:59:59.000Z))",
+      "sort": "record.createdAt A",
       // category filter current cat without nested
-      // "containerfilter": "(CategoryIds/ANY(c: c EQ 'c600bca5-fd27-46af-9857-1a4c4bf91f2b'))"
+      // "containerfilter": "(CategoryIds/ANY(c: c EQ 'af1d3de8-a86e-4fe4-a1f3-ede329eb60d3'))"
       // category filter with nested
-      // "containerfilter": "(CategoryIds/ANY(c: c EQ 'eb7ed8c7-8379-423d-bad8-c61061113c67') OR CategoryAncestorIds/ANY(c: c EQ 'eb7ed8c7-8379-423d-bad8-c61061113c67'))"
+      "containerfilter": "(CategoryIds/ANY(c: c EQ '60cfa13d-6c93-444b-a90d-1fd8905d75f4') OR CategoryAncestorIds/ANY(c: c EQ '60cfa13d-6c93-444b-a90d-1fd8905d75f4'))"
     }
     const result = await axios.post(url, data, { headers: headers })
     setAssetCount(result.data.payload.assetCount)
@@ -69,20 +71,23 @@ const App = () => {
       "count": 1000,
       "offset": offset,
       "filters": dateFilter,
+      // "filters": `(((DateSoftDeleted GE 2022-08-30T00:00:00.000Z AND DateSoftDeleted LE 2022-11-28T23:59:59.000Z) AND Status EQ 10 ${dateFilter? "AND" + dateFilter:""}))`,
+      // "includeSoftDeleted": true,
       // "filters": (dateFilter === undefined) ? "((FileExtension EQ 'XML'))" : "(" + dateFilter + " AND (FileExtension EQ 'XML'))",
       //  AVI FIlter
       // "filters": "((AssetType EQ Video AND (videoIntelligence NE null AND videoIntelligence/videoIndexerId NE '')))",
       // filter filetype
-      // filters: "((FileExtension EQ 'XML'))",
-      "sort": "record.createdAt D",
-      // "containerfilter": "(CategoryIds/ANY(c: c EQ 'c600bca5-fd27-46af-9857-1a4c4bf91f2b'))"
+      // filters: "((DateExpired GE 2023-01-01T00:00:00.000Z AND DateExpired LE 2023-03-31T23:59:59.000Z))",
+      "sort": "record.createdAt A",
+      // "containerfilter": "(CategoryIds/ANY(c: c EQ 'af1d3de8-a86e-4fe4-a1f3-ede329eb60d3'))"
       // category filter with nested
-      // "containerfilter": "(CategoryIds/ANY(c: c EQ 'eb7ed8c7-8379-423d-bad8-c61061113c67') OR CategoryAncestorIds/ANY(c: c EQ 'eb7ed8c7-8379-423d-bad8-c61061113c67'))"
+      "containerfilter": "(CategoryIds/ANY(c: c EQ '60cfa13d-6c93-444b-a90d-1fd8905d75f4') OR CategoryAncestorIds/ANY(c: c EQ '60cfa13d-6c93-444b-a90d-1fd8905d75f4'))"
 
     }
     await axios.post(url, data, { headers: headers })
       .then((res) => {
-        setAssets(assets => [...assets, ...res.data.payload.assets])
+        setAssets(res.data.payload.assets)
+        filterAssets(res.data.payload.assets)
         // if offset greater thyepan 100k (azure limit)
         if (offset < assetCount) {
           if (offset >= 100000) {
@@ -298,10 +303,9 @@ const App = () => {
 
 
   // filter data for export to csv
-  const filterAssets = () => {
-    let allAssets = assets
+  const filterAssets = (tempAssets) => {
     let tempFilteredAssets = []
-    for (let asset of allAssets) {
+    for (let asset of tempAssets) {
       let keywords = []
       let categories = []
       let views = 0
@@ -334,7 +338,7 @@ const App = () => {
       }
       tempFilteredAssets.push(filtered)
     }
-    setFilteredAssets(tempFilteredAssets)
+    setFilteredAssets(filteredAssets => [...filteredAssets, ...tempFilteredAssets])
   }
 
   const getXmpMetadata = async () => {
@@ -456,8 +460,8 @@ const App = () => {
         <label>Data Center:</label>
         <select name="DC" id="Data Centers" onChange={handleDatacenterChange}>
           <optgroup label="USA">
-            <option value="usca">USCA</option>
             <option value="usva">USVA</option>
+            <option value="usca">USCA</option>
             <option value="usva2">USVA2</option>
             <option value="usil">USIL</option>
           </optgroup>
