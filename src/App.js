@@ -56,7 +56,7 @@ const App = () => {
       // category filter current cat without nested
       // "containerfilter": "(CategoryIds/ANY(c: c EQ 'af1d3de8-a86e-4fe4-a1f3-ede329eb60d3'))"
       // category filter with nested
-      "containerfilter": "(CategoryIds/ANY(c: c EQ '60cfa13d-6c93-444b-a90d-1fd8905d75f4') OR CategoryAncestorIds/ANY(c: c EQ '60cfa13d-6c93-444b-a90d-1fd8905d75f4'))"
+      // "containerfilter": "(CategoryIds/ANY(c: c EQ '60cfa13d-6c93-444b-a90d-1fd8905d75f4') OR CategoryAncestorIds/ANY(c: c EQ '60cfa13d-6c93-444b-a90d-1fd8905d75f4'))"
     }
     const result = await axios.post(url, data, { headers: headers })
     setAssetCount(result.data.payload.assetCount)
@@ -81,23 +81,25 @@ const App = () => {
       "sort": "record.createdAt A",
       // "containerfilter": "(CategoryIds/ANY(c: c EQ 'af1d3de8-a86e-4fe4-a1f3-ede329eb60d3'))"
       // category filter with nested
-      "containerfilter": "(CategoryIds/ANY(c: c EQ '60cfa13d-6c93-444b-a90d-1fd8905d75f4') OR CategoryAncestorIds/ANY(c: c EQ '60cfa13d-6c93-444b-a90d-1fd8905d75f4'))"
-
+      // "containerfilter": "(CategoryIds/ANY(c: c EQ '60cfa13d-6c93-444b-a90d-1fd8905d75f4') OR CategoryAncestorIds/ANY(c: c EQ '60cfa13d-6c93-444b-a90d-1fd8905d75f4'))"
     }
+    console.log(offset, dateFilter)
     await axios.post(url, data, { headers: headers })
       .then((res) => {
-        setAssets(res.data.payload.assets)
-        filterAssets(res.data.payload.assets)
-        // if offset greater thyepan 100k (azure limit)
-        if (offset < assetCount) {
-          if (offset >= 100000) {
-            dateFilter = ("DateUploaded LE " + res.data.payload.assets[999].createdAt)
-            getAssets(0, dateFilter)
-          } else {
+        filterMD5(res.data.payload.assets)
+        // filterAssets(res.data.payload.assets)
+        return (res.data.payload.assets[res.data.payload.assets.length - 1].file.uploadedAt)
+      })
+      .then((date) => {
+        if (filteredAssets.length < assetCount) {
+          if (offset < 99999) {
             offset += 1000
             getAssets(offset, dateFilter)
+          } else {
+            getAssets(0, "DateUploaded GE " + date)
           }
         }
+        //console.log(offset, filteredAssets.length, date)
       })
   }
 
@@ -299,6 +301,24 @@ const App = () => {
       filteredMeta.push(filtered)
     }
     setCognitiveVideoMetadata(filteredMeta)
+  }
+
+  // filter data for only MD5 and asset Id
+  const filterMD5 = (tempAssets) => {
+    let tempMD5 = []
+    for (let asset of tempAssets) {
+      let categories = []
+      for (let category in asset.categories) {
+        categories.push(asset.categories[category])
+      }
+      let temp = {
+        AssetId: asset.id,
+        MD5Hash: asset.file.md5,
+        Categories: categories,
+      }
+      tempMD5.push(temp)
+    }
+    setFilteredAssets(filteredAssets => [...filteredAssets, ...tempMD5])
   }
 
 
