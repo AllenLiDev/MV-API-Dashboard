@@ -78,7 +78,50 @@ const App = () => {
       // "filters": "((AssetType EQ Video AND (videoIntelligence NE null AND videoIntelligence/videoIndexerId NE '')))",
       // filter filetype
       // filters: "((DateExpired GE 2023-01-01T00:00:00.000Z AND DateExpired LE 2023-03-31T23:59:59.000Z))",
-      "sort": "record.createdAt A",
+      "sort": "record.createdAt D",
+      // "containerfilter": "(CategoryIds/ANY(c: c EQ 'af1d3de8-a86e-4fe4-a1f3-ede329eb60d3'))"
+      // category filter with nested
+      // "containerfilter": "(CategoryIds/ANY(c: c EQ '60cfa13d-6c93-444b-a90d-1fd8905d75f4') OR CategoryAncestorIds/ANY(c: c EQ '60cfa13d-6c93-444b-a90d-1fd8905d75f4'))"
+    }
+    console.log(offset, dateFilter)
+    await axios.post(url, data, { headers: headers })
+      .then((res) => {
+        // filterMD5(res.data.payload.assets)
+        filterAssets(res.data.payload.assets)
+        return (res.data.payload.assets[res.data.payload.assets.length - 1].file.uploadedAt)
+      })
+      .then((date) => {
+        if (filteredAssets.length < assetCount) {
+          if (offset < 99999) {
+            offset += 1000
+            getAssets(offset, dateFilter)
+          } else {
+            getAssets(0, "DateUploaded GE " + date)
+          }
+        } else {
+          return console.log("finished")
+        }
+        //console.log(offset, filteredAssets.length, date)
+      })
+  }
+
+  // ITERATE OFFSET
+  const getMD5 = async (offset, dateFilter) => {
+    const url = `${apiUrl}assets/search`
+    // const url = `${apiUrl}categories/aec0ba15-92bb-43d7-8095-ccf2662b1fec/assets?count=1000&offset=${offset}&sort=record.createdAt+D`
+    const data = {
+      "search": "",
+      "count": 1000,
+      "offset": offset,
+      "filters": dateFilter,
+      // "filters": `(((DateSoftDeleted GE 2022-08-30T00:00:00.000Z AND DateSoftDeleted LE 2022-11-28T23:59:59.000Z) AND Status EQ 10 ${dateFilter? "AND" + dateFilter:""}))`,
+      // "includeSoftDeleted": true,
+      // "filters": (dateFilter === undefined) ? "((FileExtension EQ 'XML'))" : "(" + dateFilter + " AND (FileExtension EQ 'XML'))",
+      //  AVI FIlter
+      // "filters": "((AssetType EQ Video AND (videoIntelligence NE null AND videoIntelligence/videoIndexerId NE '')))",
+      // filter filetype
+      // filters: "((DateExpired GE 2023-01-01T00:00:00.000Z AND DateExpired LE 2023-03-31T23:59:59.000Z))",
+      "sort": "record.createdAt D",
       // "containerfilter": "(CategoryIds/ANY(c: c EQ 'af1d3de8-a86e-4fe4-a1f3-ede329eb60d3'))"
       // category filter with nested
       // "containerfilter": "(CategoryIds/ANY(c: c EQ '60cfa13d-6c93-444b-a90d-1fd8905d75f4') OR CategoryAncestorIds/ANY(c: c EQ '60cfa13d-6c93-444b-a90d-1fd8905d75f4'))"
@@ -98,6 +141,8 @@ const App = () => {
           } else {
             getAssets(0, "DateUploaded GE " + date)
           }
+        } else {
+          return console.log("finished")
         }
         //console.log(offset, filteredAssets.length, date)
       })
@@ -508,20 +553,20 @@ const App = () => {
         Total number of assets: {assetCount}
       </div>
       <div>
-        <button onClick={() => getAssets(0)}>Get All Assets</button>
-        {/* Asset Componenents
-        {assets.map(asset => (
-          <div key={asset.id}> {asset.id} </div>
-        ))} */}
-        Number of Assets Retrieved: {assets.length}
-      </div>
-      <div>
         <button onClick={getCustomAttributes}>Get Custom Attributes Mapping</button>
         Attribute Mapping Count: {cusattributes.size}
       </div>
       <div>
-        <button onClick={filterAssets}>Filter Assets</button>
-        {filteredAssets.length}
+        <button onClick={() => getAssets(0)}>Get All Metadata</button>
+      </div>
+      <div>
+        <button>Get Embedded Metadata</button>
+      </div>
+      <div>
+        <button onClick={() => getMD5(0)}>Get MD5</button>
+      </div>
+      <div>
+        Number of Assets {filteredAssets.length}
       </div>
       <div>
         <button onClick={storeToTemp}>Store To Local</button>
