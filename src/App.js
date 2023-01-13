@@ -15,9 +15,9 @@ const App = () => {
   const [apiKey, setApiKey] = useState()
   const [isLoading, setIsLoading] = useState(true)
   const [cusattributes, setCusattributes] = useState([])
-  const [username, setUsername] = useState("favoritegiftsadmin@mediavalet.net")
-  const [password, setPassword] = useState("C827bG32C9a7T34iK")
-  const [clientId, setClientId] = useState("494ace5f-0b0f-4aa8-ae64-cf241d814296")
+  const [username, setUsername] = useState("brandusaadmin@mediavalet.net")
+  const [password, setPassword] = useState("Test!234")
+  const [clientId, setClientId] = useState("3e36eca9-77c2-4d96-a322-afb9d2fb5cf6")
   const [apiUrl, setApiUrl] = useState("https://api-eunl.mediavalet.net/")
   const [authUrl, setAuthUrl] = useState('https://identity-eu.mediavalet.net/')
   const [users, setUsers] = useState([])
@@ -51,7 +51,7 @@ const App = () => {
       // "filters": "(((DateSoftDeleted GE 2022-08-30T00:00:00.000Z AND DateSoftDeleted LE 2022-11-28T23:59:59.000Z) AND Status EQ 10))",
       // "includeSoftDeleted": true,
       // no expiry date assets
-      // "filters": "((DateExpired GE 2023-01-01T00:00:00.000Z AND DateExpired LE 2023-03-31T23:59:59.000Z))",
+      "filters": "((DateExpired GE 2023-04-01T00:00:00.000Z AND DateExpired LE 2023-06-30T23:59:59.000Z))",
       "sort": "record.createdAt A",
       // category filter current cat without nested
       // "containerfilter": "(CategoryIds/ANY(c: c EQ 'af1d3de8-a86e-4fe4-a1f3-ede329eb60d3'))"
@@ -77,7 +77,7 @@ const App = () => {
       //  AVI FIlter
       // "filters": "((AssetType EQ Video AND (videoIntelligence NE null AND videoIntelligence/videoIndexerId NE '')))",
       // filter filetype
-      // filters: "((DateExpired GE 2023-01-01T00:00:00.000Z AND DateExpired LE 2023-03-31T23:59:59.000Z))",
+      filters: "((DateExpired GE 2023-04-01T00:00:00.000Z AND DateExpired LE 2023-06-30T23:59:59.000Z))",
       "sort": "record.createdAt D",
       // "containerfilter": "(CategoryIds/ANY(c: c EQ 'af1d3de8-a86e-4fe4-a1f3-ede329eb60d3'))"
       // category filter with nested
@@ -120,7 +120,7 @@ const App = () => {
       //  AVI FIlter
       // "filters": "((AssetType EQ Video AND (videoIntelligence NE null AND videoIntelligence/videoIndexerId NE '')))",
       // filter filetype
-      // filters: "((DateExpired GE 2023-01-01T00:00:00.000Z AND DateExpired LE 2023-03-31T23:59:59.000Z))",
+      filters: "((DateExpired GE 2023-04-01T00:00:00.000Z AND DateExpired LE 2023-06-30T23:59:59.000Z))",
       "sort": "record.createdAt D",
       // "containerfilter": "(CategoryIds/ANY(c: c EQ 'af1d3de8-a86e-4fe4-a1f3-ede329eb60d3'))"
       // category filter with nested
