@@ -15,11 +15,11 @@ const App = () => {
   const [apiKey, setApiKey] = useState()
   const [isLoading, setIsLoading] = useState(true)
   const [cusattributes, setCusattributes] = useState([])
-  const [username, setUsername] = useState("allenliadmin%40mediavalet.net")
-  const [password, setPassword] = useState("8Z9M7bR!")
-  const [clientId, setClientId] = useState("0cce9ca4-93a5-48a7-9e6a-29022fa16c51")
-  const [apiUrl, setApiUrl] = useState("https://api-usva.mediavalet.net/")
-  const [authUrl, setAuthUrl] = useState('https://identity-va.mediavalet.net/')
+  const [username, setUsername] = useState("favoritegiftsadmin@mediavalet.net")
+  const [password, setPassword] = useState("C827bG32C9a7T34iK")
+  const [clientId, setClientId] = useState("494ace5f-0b0f-4aa8-ae64-cf241d814296")
+  const [apiUrl, setApiUrl] = useState("https://api-eunl.mediavalet.net/")
+  const [authUrl, setAuthUrl] = useState('https://identity-eu.mediavalet.net/')
   const [users, setUsers] = useState([])
   const [xmpMetadata, setXmpMetadata] = useState([])
   const headers = {
@@ -56,7 +56,7 @@ const App = () => {
       // category filter current cat without nested
       // "containerfilter": "(CategoryIds/ANY(c: c EQ 'af1d3de8-a86e-4fe4-a1f3-ede329eb60d3'))"
       // category filter with nested
-      // "containerfilter": "(CategoryIds/ANY(c: c EQ '60cfa13d-6c93-444b-a90d-1fd8905d75f4') OR CategoryAncestorIds/ANY(c: c EQ '60cfa13d-6c93-444b-a90d-1fd8905d75f4'))"
+      // "containerfilter": "(CategoryIds/ANY(c: c EQ '4024cc5c-827f-442a-986c-c0c246ae32c6') OR CategoryAncestorIds/ANY(c: c EQ '4024cc5c-827f-442a-986c-c0c246ae32c6'))"
     }
     const result = await axios.post(url, data, { headers: headers })
     setAssetCount(result.data.payload.assetCount)
@@ -81,7 +81,7 @@ const App = () => {
       "sort": "record.createdAt D",
       // "containerfilter": "(CategoryIds/ANY(c: c EQ 'af1d3de8-a86e-4fe4-a1f3-ede329eb60d3'))"
       // category filter with nested
-      // "containerfilter": "(CategoryIds/ANY(c: c EQ '60cfa13d-6c93-444b-a90d-1fd8905d75f4') OR CategoryAncestorIds/ANY(c: c EQ '60cfa13d-6c93-444b-a90d-1fd8905d75f4'))"
+      // "containerfilter": "(CategoryIds/ANY(c: c EQ '4024cc5c-827f-442a-986c-c0c246ae32c6') OR CategoryAncestorIds/ANY(c: c EQ '4024cc5c-827f-442a-986c-c0c246ae32c6'))"
     }
     console.log(offset, dateFilter)
     await axios.post(url, data, { headers: headers })
@@ -137,9 +137,9 @@ const App = () => {
         if (filteredAssets.length < assetCount) {
           if (offset < 99999) {
             offset += 1000
-            getAssets(offset, dateFilter)
+            getMD5(offset, dateFilter)
           } else {
-            getAssets(0, "DateUploaded GE " + date)
+            getMD5(0, "DateUploaded GE " + date)
           }
         } else {
           return console.log("finished")
