@@ -3,6 +3,9 @@ import { useState, useEffect } from 'react';
 import './App.css';
 import { CSVLink, CSVDownload } from "react-csv";
 import fileDownload from 'js-file-download';
+import { observer } from "mobx-react" // Or "mobx-react".
+import Assets from './components/Assets';
+import { StoreContextProvider } from './context/store.context';
 
 const App = () => {
   const [assets, setAssets] = useState([])
@@ -623,8 +626,11 @@ const App = () => {
       <div>
         <CSVLink data={xmpMetadata}>Export XMP Metadata</CSVLink>
       </div>
+      <StoreContextProvider>
+        <Assets />
+      </StoreContextProvider>
     </div>
   );
 }
 
-export default App;
+export default observer(App);
