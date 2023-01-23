@@ -54,12 +54,12 @@ const App = () => {
       // "filters": "(((DateSoftDeleted GE 2022-08-30T00:00:00.000Z AND DateSoftDeleted LE 2022-11-28T23:59:59.000Z) AND Status EQ 10))",
       // "includeSoftDeleted": true,
       // no expiry date assets
-      "filters": "((DateExpired GE 2023-04-01T00:00:00.000Z AND DateExpired LE 2023-06-30T23:59:59.000Z))",
+      // "filters": "((DateExpired GE 2023-04-01T00:00:00.000Z AND DateExpired LE 2023-06-30T23:59:59.000Z))",
       "sort": "record.createdAt A",
       // category filter current cat without nested
       // "containerfilter": "(CategoryIds/ANY(c: c EQ 'af1d3de8-a86e-4fe4-a1f3-ede329eb60d3'))"
       // category filter with nested
-      // "containerfilter": "(CategoryIds/ANY(c: c EQ '4024cc5c-827f-442a-986c-c0c246ae32c6') OR CategoryAncestorIds/ANY(c: c EQ '4024cc5c-827f-442a-986c-c0c246ae32c6'))"
+      // "containerfilter": "(CategoryIds/ANY(c: c EQ '38e6247d-5471-427b-bf35-5ca9a0c9407b') OR CategoryAncestorIds/ANY(c: c EQ '38e6247d-5471-427b-bf35-5ca9a0c9407b'))"
     }
     const result = await axios.post(url, data, { headers: headers })
     setAssetCount(result.data.payload.assetCount)
@@ -80,11 +80,11 @@ const App = () => {
       //  AVI FIlter
       // "filters": "((AssetType EQ Video AND (videoIntelligence NE null AND videoIntelligence/videoIndexerId NE '')))",
       // filter filetype
-      filters: "((DateExpired GE 2023-04-01T00:00:00.000Z AND DateExpired LE 2023-06-30T23:59:59.000Z))",
+      // filters: "((DateExpired GE 2023-04-01T00:00:00.000Z AND DateExpired LE 2023-06-30T23:59:59.000Z))",
       "sort": "record.createdAt D",
       // "containerfilter": "(CategoryIds/ANY(c: c EQ 'af1d3de8-a86e-4fe4-a1f3-ede329eb60d3'))"
       // category filter with nested
-      // "containerfilter": "(CategoryIds/ANY(c: c EQ '4024cc5c-827f-442a-986c-c0c246ae32c6') OR CategoryAncestorIds/ANY(c: c EQ '4024cc5c-827f-442a-986c-c0c246ae32c6'))"
+      // "containerfilter": "(CategoryIds/ANY(c: c EQ '38e6247d-5471-427b-bf35-5ca9a0c9407b') OR CategoryAncestorIds/ANY(c: c EQ '38e6247d-5471-427b-bf35-5ca9a0c9407b'))"
     }
     console.log(offset, dateFilter)
     await axios.post(url, data, { headers: headers })
@@ -123,7 +123,7 @@ const App = () => {
       //  AVI FIlter
       // "filters": "((AssetType EQ Video AND (videoIntelligence NE null AND videoIntelligence/videoIndexerId NE '')))",
       // filter filetype
-      filters: "((DateExpired GE 2023-04-01T00:00:00.000Z AND DateExpired LE 2023-06-30T23:59:59.000Z))",
+      // filters: "((DateExpired GE 2023-04-01T00:00:00.000Z AND DateExpired LE 2023-06-30T23:59:59.000Z))",
       "sort": "record.createdAt D",
       // "containerfilter": "(CategoryIds/ANY(c: c EQ 'af1d3de8-a86e-4fe4-a1f3-ede329eb60d3'))"
       // category filter with nested
@@ -410,26 +410,23 @@ const App = () => {
   }
 
   const getXmpMetadata = async () => {
-    for (let count = 10000; count < assetCount; count++) {
-      const url = `${apiUrl}assets/${assets[count].id}/xmp`
-      await axios.get(url, { headers: headers })
+    for (let count = 0; count < assetCount; count += 1000) {
+      setTimeout(() => {
+        getXmpMetadataLoop(count)
+      }, count * 75);
+    }
+  }
+
+  const getXmpMetadataLoop = (count) => {
+    for (let i = count; i < (count + 1000); i++) {
+      const url = `${apiUrl}assets/${filteredAssets[i].AssetId}/xmp`
+      axios.get(url, { headers: headers })
         .then((res) => {
           setXmpMetadata(xmpMetadata => [
             ...xmpMetadata,
             {
-              assetId: assets[count].id,
-              assetType: res.data.payload[0].propertyValue,
-              metadataCredit: res.data.payload[6].propertyValue,
-              dateCreate: res.data.payload[7].propertyValue,
-              dateInput: res.data.payload[8].propertyValue,
-              doNotUseImage: res.data.payload[9].propertyValue,
-              expirationDate: res.data.payload[11].propertyValue,
-              imageKind: res.data.payload[13].propertyValue,
-              keyword: res.data.payload[17].propertyValue,
-              library: res.data.payload[18].propertyValue,
-              merlinId: res.data.payload[24].propertyValue,
-              modality: res.data.payload[25].propertyValue,
-              objectAssetId: res.data.payload[27].propertyValue,
+              assetId: filteredAssets[i].AssetId,
+              assetType: res.data.payload[30].propertyValue,
             }
           ])
         })
@@ -438,6 +435,7 @@ const App = () => {
         })
     }
   }
+
 
   useEffect(() => {
   }, [])
