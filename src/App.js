@@ -14,6 +14,7 @@ const App = () => {
   const [cognitiveImageMetadata, setCognitiveImageMetadata] = useState([])
   const [cognitiveVideoMetadata, setCognitiveVideoMetadata] = useState([])
   const [cognitiveVideoIds, setCognitiveVideoIds] = useState([])
+  const [lastDate, setlastDate] = useState("")
   const [aviTokens, setAviTokens] = useState([])
   const [apiKey, setApiKey] = useState()
   const [isLoading, setIsLoading] = useState(true)
@@ -59,21 +60,21 @@ const App = () => {
       // category filter current cat without nested
       // "containerfilter": "(CategoryIds/ANY(c: c EQ 'af1d3de8-a86e-4fe4-a1f3-ede329eb60d3'))"
       // category filter with nested
-      // "containerfilter": "(CategoryIds/ANY(c: c EQ '38e6247d-5471-427b-bf35-5ca9a0c9407b') OR CategoryAncestorIds/ANY(c: c EQ '38e6247d-5471-427b-bf35-5ca9a0c9407b'))"
+      // "containerfilter": "(CategoryIds/ANY(c: c EQ 'a668950c-6ec4-4850-b08d-3cf3e9d8d2ab') OR CategoryAncestorIds/ANY(c: c EQ 'a668950c-6ec4-4850-b08d-3cf3e9d8d2ab'))"
     }
     const result = await axios.post(url, data, { headers: headers })
     setAssetCount(result.data.payload.assetCount)
   }
 
   // ITERATE OFFSET
-  const getAssets = async (offset, dateFilter) => {
+  const getAssets = async (offset) => {
     const url = `${apiUrl}assets/search`
     // const url = `${apiUrl}categories/aec0ba15-92bb-43d7-8095-ccf2662b1fec/assets?count=1000&offset=${offset}&sort=record.createdAt+D`
     const data = {
       "search": "",
       "count": 1000,
       "offset": offset,
-      "filters": dateFilter,
+      "filters": lastDate,
       // "filters": `(((DateSoftDeleted GE 2022-08-30T00:00:00.000Z AND DateSoftDeleted LE 2022-11-28T23:59:59.000Z) AND Status EQ 10 ${dateFilter? "AND" + dateFilter:""}))`,
       // "includeSoftDeleted": true,
       // "filters": (dateFilter === undefined) ? "((FileExtension EQ 'XML'))" : "(" + dateFilter + " AND (FileExtension EQ 'XML'))",
@@ -84,39 +85,38 @@ const App = () => {
       "sort": "record.createdAt D",
       // "containerfilter": "(CategoryIds/ANY(c: c EQ 'af1d3de8-a86e-4fe4-a1f3-ede329eb60d3'))"
       // category filter with nested
-      // "containerfilter": "(CategoryIds/ANY(c: c EQ '38e6247d-5471-427b-bf35-5ca9a0c9407b') OR CategoryAncestorIds/ANY(c: c EQ '38e6247d-5471-427b-bf35-5ca9a0c9407b'))"
+      // "containerfilter": "(CategoryIds/ANY(c: c EQ 'a668950c-6ec4-4850-b08d-3cf3e9d8d2ab') OR CategoryAncestorIds/ANY(c: c EQ 'a668950c-6ec4-4850-b08d-3cf3e9d8d2ab'))"
     }
-    console.log(offset, dateFilter)
+    // console.log(offset, lastDate)
     await axios.post(url, data, { headers: headers })
       .then((res) => {
         // filterMD5(res.data.payload.assets)
         filterAssets(res.data.payload.assets)
-        return (res.data.payload.assets[res.data.payload.assets.length - 1].file.uploadedAt)
+        return ("DateUploaded GE " + res.data.payload.assets[res.data.payload.assets.length - 1].file.uploadedAt)
       })
       .then((date) => {
         if (filteredAssets.length < assetCount) {
           if (offset < 99999) {
             offset += 1000
-            getAssets(offset, dateFilter)
+            getAssets(offset)
           } else {
-            getAssets(0, "DateUploaded GE " + date)
+            setlastDate(date)
+            console.log("100k metadata finished. Please export Data.")
           }
-        } else {
-          return console.log("finished")
         }
         //console.log(offset, filteredAssets.length, date)
       })
   }
 
   // ITERATE OFFSET
-  const getMD5 = async (offset, dateFilter) => {
+  const getMD5 = async (offset) => {
     const url = `${apiUrl}assets/search`
     // const url = `${apiUrl}categories/aec0ba15-92bb-43d7-8095-ccf2662b1fec/assets?count=1000&offset=${offset}&sort=record.createdAt+D`
     const data = {
       "search": "",
       "count": 1000,
       "offset": offset,
-      "filters": dateFilter,
+      "filters": lastDate,
       // "filters": `(((DateSoftDeleted GE 2022-08-30T00:00:00.000Z AND DateSoftDeleted LE 2022-11-28T23:59:59.000Z) AND Status EQ 10 ${dateFilter? "AND" + dateFilter:""}))`,
       // "includeSoftDeleted": true,
       // "filters": (dateFilter === undefined) ? "((FileExtension EQ 'XML'))" : "(" + dateFilter + " AND (FileExtension EQ 'XML'))",
@@ -129,23 +129,20 @@ const App = () => {
       // category filter with nested
       // "containerfilter": "(CategoryIds/ANY(c: c EQ '60cfa13d-6c93-444b-a90d-1fd8905d75f4') OR CategoryAncestorIds/ANY(c: c EQ '60cfa13d-6c93-444b-a90d-1fd8905d75f4'))"
     }
-    console.log(offset, dateFilter)
+    // console.log(offset, lastDate)
     await axios.post(url, data, { headers: headers })
       .then((res) => {
         filterMD5(res.data.payload.assets)
         // filterAssets(res.data.payload.assets)
-        return (res.data.payload.assets[res.data.payload.assets.length - 1].file.uploadedAt)
+        return ("DateUploaded GE " + res.data.payload.assets[res.data.payload.assets.length - 1].file.uploadedAt)
       })
       .then((date) => {
-        if (filteredAssets.length < assetCount) {
-          if (offset < 99999) {
-            offset += 1000
-            getMD5(offset, dateFilter)
-          } else {
-            getMD5(0, "DateUploaded GE " + date)
-          }
+        if (offset < 99999) {
+          offset += 1000
+          getMD5(offset, lastDate)
         } else {
-          return console.log("finished")
+          setlastDate(date)
+          console.log("100k MD5 finished. Please export Data.")
         }
         //console.log(offset, filteredAssets.length, date)
       })
@@ -362,6 +359,7 @@ const App = () => {
       let temp = {
         AssetId: asset.id,
         MD5Hash: asset.file.md5,
+        Size: asset.file.sizeInBytes,
         Categories: categories,
       }
       tempMD5.push(temp)
@@ -570,6 +568,9 @@ const App = () => {
         Number of Assets {filteredAssets.length}
       </div>
       <div>
+        Date {lastDate}
+      </div>
+      <div>
         <button onClick={storeToTemp}>Store To Local</button>
       </div>
       {/* <div>
@@ -577,6 +578,9 @@ const App = () => {
       </div> */}
       <div>
         <CSVLink data={filteredAssets}>Export Metadata</CSVLink>
+      </div>
+      <div>
+        <button onClick={() => setFilteredAssets([])}>Reset Data</button>
       </div>
       <br />
       <div>
