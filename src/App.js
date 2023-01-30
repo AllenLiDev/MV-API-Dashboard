@@ -25,7 +25,10 @@ const App = () => {
   const [apiUrl, setApiUrl] = useState("https://api-eunl.mediavalet.net/")
   const [authUrl, setAuthUrl] = useState('https://identity-eu.mediavalet.net/')
   const [users, setUsers] = useState([])
+  const [iptcMetadata, setIptcMetadata] = useState([])
+  const [exifMetadata, setExifMetadata] = useState([])
   const [xmpMetadata, setXmpMetadata] = useState([])
+
   const headers = {
     'content-type': 'application/json',
     'authorization': apiKey
@@ -137,12 +140,14 @@ const App = () => {
         return ("DateUploaded GE " + res.data.payload.assets[res.data.payload.assets.length - 1].file.uploadedAt)
       })
       .then((date) => {
-        if (offset < 99999) {
-          offset += 1000
-          getMD5(offset, lastDate)
-        } else {
-          setlastDate(date)
-          console.log("100k MD5 finished. Please export Data.")
+        if (filteredAssets.length < assetCount) {
+          if (offset < 99999) {
+            offset += 1000
+            getMD5(offset, lastDate)
+          } else {
+            setlastDate(date)
+            console.log("100k MD5 finished. Please export Data.")
+          }
         }
         //console.log(offset, filteredAssets.length, date)
       })
@@ -367,7 +372,6 @@ const App = () => {
     setFilteredAssets(filteredAssets => [...filteredAssets, ...tempMD5])
   }
 
-
   // filter data for export to csv
   const filterAssets = (tempAssets) => {
     let tempFilteredAssets = []
@@ -407,26 +411,55 @@ const App = () => {
     setFilteredAssets(filteredAssets => [...filteredAssets, ...tempFilteredAssets])
   }
 
-  const getXmpMetadata = async () => {
+  const getXMP = () => {
     for (let count = 0; count < assetCount; count += 1000) {
       setTimeout(() => {
-        getXmpMetadataLoop(count)
-      }, count * 75);
+        if ((assetCount - count) < 1000) {
+          getXmpMetadataLoop(count, (assetCount - count))
+        } else {
+          getXmpMetadataLoop(count, 1000)
+        }
+      }, count * 60);
     }
   }
 
-  const getXmpMetadataLoop = (count) => {
-    for (let i = count; i < (count + 1000); i++) {
+  const getEXIF = () => {
+    for (let count = 0; count < assetCount; count += 1000) {
+      setTimeout(() => {
+        if ((assetCount - count) < 1000) {
+          getExifMetadataLoop(count, (assetCount - count))
+        } else {
+          getExifMetadataLoop(count, 1000)
+        }
+      }, count * 60);
+    }
+  }
+
+  const getIPTC = () => {
+    for (let count = 0; count < assetCount; count += 1000) {
+      setTimeout(() => {
+        if ((assetCount - count) < 1000) {
+          getIptcMetadataLoop(count, (assetCount - count))
+        } else {
+          getIptcMetadataLoop(count, 1000)
+        }
+      }, count * 60);
+    }
+  }
+
+  const getXmpMetadataLoop = (count, max) => {
+    for (let i = count; i < (count + max); i++) {
       const url = `${apiUrl}assets/${filteredAssets[i].AssetId}/xmp`
       axios.get(url, { headers: headers })
         .then((res) => {
-          setXmpMetadata(xmpMetadata => [
-            ...xmpMetadata,
-            {
-              assetId: filteredAssets[i].AssetId,
-              assetType: res.data.payload[30].propertyValue,
-            }
-          ])
+          let value = {
+            AssetId: filteredAssets[i].AssetId
+          }
+          for (let attribute of res.data.payload) {
+            let { propertyValue, propertyName } = attribute
+            value[propertyName] = propertyValue
+          }
+          setXmpMetadata(xmpMetadata => [...xmpMetadata, value])
         })
         .catch(err => {
           console.log(err)
@@ -434,6 +467,45 @@ const App = () => {
     }
   }
 
+  const getIptcMetadataLoop = (count, max) => {
+    for (let i = count; i < (count + max); i++) {
+      const url = `${apiUrl}assets/${filteredAssets[i].AssetId}/iptc`
+      axios.get(url, { headers: headers })
+        .then((res) => {
+          let value = {
+            AssetId: filteredAssets[i].AssetId
+          }
+          for (let attribute of res.data.payload) {
+            let { propertyValue, propertyName } = attribute
+            value[propertyName] = propertyValue
+          }
+          setIptcMetadata(iptcMetadata => [...iptcMetadata, value])
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    }
+  }
+
+  const getExifMetadataLoop = (count, max) => {
+    for (let i = count; i < (count + max); i++) {
+      const url = `${apiUrl}assets/${filteredAssets[i].AssetId}/exif`
+      axios.get(url, { headers: headers })
+        .then((res) => {
+          let value = {
+            AssetId: filteredAssets[i].AssetId
+          }
+          for (let attribute of res.data.payload) {
+            let { propertyValue, propertyName } = attribute
+            value[propertyName] = propertyValue
+          }
+          setExifMetadata(exifMetadata => [...exifMetadata, value])
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    }
+  }
 
   useEffect(() => {
   }, [])
@@ -622,15 +694,37 @@ const App = () => {
       </div>
       <br />
       <div>
-        <button onClick={getXmpMetadata}>get XMP Metadata</button>
-        {xmpMetadata.length}
-      </div>
-      <div>
         <CSVLink data={xmpMetadata}>Export XMP Metadata</CSVLink>
       </div>
       <StoreContextProvider>
         <Assets />
       </StoreContextProvider>
+      <br />
+      <br />
+      <br />
+      <div>
+        <button onClick={() => getIPTC()}>get IPTC</button>
+        {iptcMetadata.length}
+      </div>
+      <div>
+        <CSVLink data={iptcMetadata}>Export IPTC Metadata</CSVLink>
+      </div>
+      <br />
+      <div>
+        <button onClick={() => getEXIF()}>Get EXIF</button>
+        {exifMetadata.length}
+      </div>
+      <div>
+        <CSVLink data={exifMetadata}>Export EXIF Metadata</CSVLink>
+      </div>
+      <br />
+      <div>
+        <button onClick={() => getXMP()}>Get XMP</button>
+        {xmpMetadata.length}
+      </div>
+      <div>
+        <CSVLink data={xmpMetadata}>Export XMP Metadata</CSVLink>
+      </div>
     </div>
   );
 }
