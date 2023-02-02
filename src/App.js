@@ -14,7 +14,7 @@ const App = () => {
   const [cognitiveImageMetadata, setCognitiveImageMetadata] = useState([])
   const [cognitiveVideoMetadata, setCognitiveVideoMetadata] = useState([])
   const [cognitiveVideoIds, setCognitiveVideoIds] = useState([])
-  const [lastDate, setlastDate] = useState("")
+  const [lastDate, setlastDate] = useState("DateUploaded LE 2023-01-13T21:26:08.835Z")
   const [aviTokens, setAviTokens] = useState([])
   const [apiKey, setApiKey] = useState()
   const [isLoading, setIsLoading] = useState(true)
@@ -95,15 +95,14 @@ const App = () => {
       .then((res) => {
         // filterMD5(res.data.payload.assets)
         filterAssets(res.data.payload.assets)
-        return ("DateUploaded GE " + res.data.payload.assets[res.data.payload.assets.length - 1].file.uploadedAt)
       })
-      .then((date) => {
+      .then(() => {
         if (filteredAssets.length < assetCount) {
           if (offset < 99999) {
             offset += 1000
             getAssets(offset)
           } else {
-            setlastDate(date)
+            setlastDate("DateUploaded LE " + filteredAssets[filteredAssets.length - 1].UploadDate)
             console.log("100k metadata finished. Please export Data.")
           }
         }
@@ -136,16 +135,14 @@ const App = () => {
     await axios.post(url, data, { headers: headers })
       .then((res) => {
         filterMD5(res.data.payload.assets)
-        // filterAssets(res.data.payload.assets)
-        return ("DateUploaded GE " + res.data.payload.assets[res.data.payload.assets.length - 1].file.uploadedAt)
       })
-      .then((date) => {
+      .then(() => {
         if (filteredAssets.length < assetCount) {
           if (offset < 99999) {
             offset += 1000
-            getMD5(offset, lastDate)
+            getMD5(offset)
           } else {
-            setlastDate(date)
+            setlastDate("DateUploaded LE " + filteredAssets[filteredAssets.length - 1].UploadDate)
             console.log("100k MD5 finished. Please export Data.")
           }
         }
@@ -364,8 +361,8 @@ const App = () => {
       let temp = {
         AssetId: asset.id,
         MD5Hash: asset.file.md5,
-        Size: asset.file.sizeInBytes,
         Categories: categories,
+        UploadDate: new Date(asset.file.uploadedAt),
       }
       tempMD5.push(temp)
     }
