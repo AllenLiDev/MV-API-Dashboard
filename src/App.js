@@ -14,7 +14,7 @@ const App = () => {
   const [cognitiveImageMetadata, setCognitiveImageMetadata] = useState([])
   const [cognitiveVideoMetadata, setCognitiveVideoMetadata] = useState([])
   const [cognitiveVideoIds, setCognitiveVideoIds] = useState([])
-  const [lastDate, setlastDate] = useState("DateUploaded LE 2023-01-13T21:26:08.835Z")
+  const [lastDate, setLastDate] = useState("")
   const [aviTokens, setAviTokens] = useState([])
   const [apiKey, setApiKey] = useState()
   const [isLoading, setIsLoading] = useState(true)
@@ -63,7 +63,7 @@ const App = () => {
       // category filter current cat without nested
       // "containerfilter": "(CategoryIds/ANY(c: c EQ 'af1d3de8-a86e-4fe4-a1f3-ede329eb60d3'))"
       // category filter with nested
-      // "containerfilter": "(CategoryIds/ANY(c: c EQ 'a668950c-6ec4-4850-b08d-3cf3e9d8d2ab') OR CategoryAncestorIds/ANY(c: c EQ 'a668950c-6ec4-4850-b08d-3cf3e9d8d2ab'))"
+      "containerfilter": "(CategoryIds/ANY(c: c EQ '6ad39bac-c27a-41fa-b84a-60b726bfa8d8') OR CategoryAncestorIds/ANY(c: c EQ '6ad39bac-c27a-41fa-b84a-60b726bfa8d8'))"
     }
     const result = await axios.post(url, data, { headers: headers })
     setAssetCount(result.data.payload.assetCount)
@@ -88,21 +88,22 @@ const App = () => {
       "sort": "record.createdAt D",
       // "containerfilter": "(CategoryIds/ANY(c: c EQ 'af1d3de8-a86e-4fe4-a1f3-ede329eb60d3'))"
       // category filter with nested
-      // "containerfilter": "(CategoryIds/ANY(c: c EQ 'a668950c-6ec4-4850-b08d-3cf3e9d8d2ab') OR CategoryAncestorIds/ANY(c: c EQ 'a668950c-6ec4-4850-b08d-3cf3e9d8d2ab'))"
+      "containerfilter": "(CategoryIds/ANY(c: c EQ '6ad39bac-c27a-41fa-b84a-60b726bfa8d8') OR CategoryAncestorIds/ANY(c: c EQ '6ad39bac-c27a-41fa-b84a-60b726bfa8d8'))"
     }
     // console.log(offset, lastDate)
     await axios.post(url, data, { headers: headers })
       .then((res) => {
         // filterMD5(res.data.payload.assets)
         filterAssets(res.data.payload.assets)
+        return ("DateUploaded LE " + res.data.payload.assets[res.data.payload.assets.length - 1].file.uploadedAt)
       })
-      .then(() => {
+      .then((date) => {
         if (filteredAssets.length < assetCount) {
           if (offset < 99999) {
             offset += 1000
             getAssets(offset)
           } else {
-            setlastDate("DateUploaded LE " + filteredAssets[filteredAssets.length - 1].UploadDate)
+            setLastDate(date)
             console.log("100k metadata finished. Please export Data.")
           }
         }
@@ -129,20 +130,21 @@ const App = () => {
       "sort": "record.createdAt D",
       // "containerfilter": "(CategoryIds/ANY(c: c EQ 'af1d3de8-a86e-4fe4-a1f3-ede329eb60d3'))"
       // category filter with nested
-      // "containerfilter": "(CategoryIds/ANY(c: c EQ '60cfa13d-6c93-444b-a90d-1fd8905d75f4') OR CategoryAncestorIds/ANY(c: c EQ '60cfa13d-6c93-444b-a90d-1fd8905d75f4'))"
+      "containerfilter": "(CategoryIds/ANY(c: c EQ '6ad39bac-c27a-41fa-b84a-60b726bfa8d8') OR CategoryAncestorIds/ANY(c: c EQ '6ad39bac-c27a-41fa-b84a-60b726bfa8d8'))"
     }
     // console.log(offset, lastDate)
     await axios.post(url, data, { headers: headers })
       .then((res) => {
         filterMD5(res.data.payload.assets)
+        return ("DateUploaded LE " + res.data.payload.assets[res.data.payload.assets.length - 1].file.uploadedAt)
       })
-      .then(() => {
+      .then((date) => {
         if (filteredAssets.length < assetCount) {
           if (offset < 99999) {
             offset += 1000
             getMD5(offset)
           } else {
-            setlastDate("DateUploaded LE " + filteredAssets[filteredAssets.length - 1].UploadDate)
+            setLastDate(date)
             console.log("100k MD5 finished. Please export Data.")
           }
         }
@@ -362,7 +364,7 @@ const App = () => {
         AssetId: asset.id,
         MD5Hash: asset.file.md5,
         Categories: categories,
-        UploadDate: new Date(asset.file.uploadedAt),
+        UploadDate: new Date(asset.file.uploadedAt)
       }
       tempMD5.push(temp)
     }
