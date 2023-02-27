@@ -34,6 +34,14 @@ const App = () => {
     'authorization': apiKey
   }
 
+  const statusStore = {
+    "0": "approved",
+    "2": "pending",
+    "5": "rejected",
+    "7": "expired",
+    "9": "checked out",
+  }
+
   // AUTHENTICATE
   const getApiKey = async () => {
     const url = `${authUrl}token`
@@ -63,7 +71,7 @@ const App = () => {
       // category filter current cat without nested
       // "containerfilter": "(CategoryIds/ANY(c: c EQ 'af1d3de8-a86e-4fe4-a1f3-ede329eb60d3'))"
       // category filter with nested
-      // "containerfilter": "(CategoryIds/ANY(c: c EQ '6ad39bac-c27a-41fa-b84a-60b726bfa8d8') OR CategoryAncestorIds/ANY(c: c EQ '6ad39bac-c27a-41fa-b84a-60b726bfa8d8'))"
+      // "containerfilter": "(CategoryIds/ANY(c: c EQ '13e8de71-5282-493d-a593-b8d13fa8c536') OR CategoryAncestorIds/ANY(c: c EQ '13e8de71-5282-493d-a593-b8d13fa8c536'))"
     }
     const result = await axios.post(url, data, { headers: headers })
     setAssetCount(result.data.payload.assetCount)
@@ -88,7 +96,7 @@ const App = () => {
       "sort": "record.createdAt D",
       // "containerfilter": "(CategoryIds/ANY(c: c EQ 'af1d3de8-a86e-4fe4-a1f3-ede329eb60d3'))"
       // category filter with nested
-      // "containerfilter": "(CategoryIds/ANY(c: c EQ '6ad39bac-c27a-41fa-b84a-60b726bfa8d8') OR CategoryAncestorIds/ANY(c: c EQ '6ad39bac-c27a-41fa-b84a-60b726bfa8d8'))"
+      // "containerfilter": "(CategoryIds/ANY(c: c EQ '13e8de71-5282-493d-a593-b8d13fa8c536') OR CategoryAncestorIds/ANY(c: c EQ '13e8de71-5282-493d-a593-b8d13fa8c536'))"
     }
     // console.log(offset, lastDate)
     await axios.post(url, data, { headers: headers })
@@ -130,7 +138,7 @@ const App = () => {
       "sort": "record.createdAt D",
       // "containerfilter": "(CategoryIds/ANY(c: c EQ 'af1d3de8-a86e-4fe4-a1f3-ede329eb60d3'))"
       // category filter with nested
-      // "containerfilter": "(CategoryIds/ANY(c: c EQ '6ad39bac-c27a-41fa-b84a-60b726bfa8d8') OR CategoryAncestorIds/ANY(c: c EQ '6ad39bac-c27a-41fa-b84a-60b726bfa8d8'))"
+      // "containerfilter": "(CategoryIds/ANY(c: c EQ '13e8de71-5282-493d-a593-b8d13fa8c536') OR CategoryAncestorIds/ANY(c: c EQ '13e8de71-5282-493d-a593-b8d13fa8c536'))"
     }
     // console.log(offset, lastDate)
     await axios.post(url, data, { headers: headers })
@@ -415,7 +423,8 @@ const App = () => {
         UploadedBy: asset.record.createdBy.username,
         ExpiryDate: new Date(asset.file.expiresAt),
         Versions: asset.record.version.version,
-        TotalViews: views
+        TotalViews: views,
+        AssetStatus: statusStore[asset.status]
       }
       // custom attributes with mapping
       for (let attribute in asset.attributes) {
