@@ -19,15 +19,17 @@ const App = () => {
   const [apiKey, setApiKey] = useState()
   const [isLoading, setIsLoading] = useState(true)
   const [cusattributes, setCusattributes] = useState([])
-  const [username, setUsername] = useState("brandusaadmin@mediavalet.net")
-  const [password, setPassword] = useState("Test!234")
-  const [clientId, setClientId] = useState("3e36eca9-77c2-4d96-a322-afb9d2fb5cf6")
-  const [apiUrl, setApiUrl] = useState("https://api-eunl.mediavalet.net/")
-  const [authUrl, setAuthUrl] = useState('https://identity-eu.mediavalet.net/')
+  const [username, setUsername] = useState("")
+  const [password, setPassword] = useState("")
+  const [clientId, setClientId] = useState("0cce9ca4-93a5-48a7-9e6a-29022fa16c51")
+  const [apiUrl, setApiUrl] = useState("https://api-usva.mediavalet.net/")
+  const [authUrl, setAuthUrl] = useState('https://identity-va.mediavalet.net/')
+  const [modernApiUrl, setModernApiURL] = useState("https://mv-api-eunl.mediavalet.net/")
   const [users, setUsers] = useState([])
   const [iptcMetadata, setIptcMetadata] = useState([])
   const [exifMetadata, setExifMetadata] = useState([])
   const [xmpMetadata, setXmpMetadata] = useState([])
+  const [cdnLinks, setCdnLinks] = useState([])
 
   const headers = {
     'content-type': 'application/json',
@@ -66,18 +68,18 @@ const App = () => {
       // "filters": "(((DateSoftDeleted GE 2022-08-30T00:00:00.000Z AND DateSoftDeleted LE 2022-11-28T23:59:59.000Z) AND Status EQ 10))",
       // "includeSoftDeleted": true,
       // no expiry date assets
-      // "filters": "((DateExpired GE 2023-07-01T00:00:00.000Z AND DateExpired LE 2023-09-30T23:59:59.000Z))",
+      // "filters": "((DateSoftDeleted GT 2023-02-17T23:04:05.963Z AND Status EQ 10))",
       "sort": "record.createdAt A",
       // category filter current cat without nested
-      // "containerfilter": "(CategoryIds/ANY(c: c EQ 'af1d3de8-a86e-4fe4-a1f3-ede329eb60d3'))"
+      // "containerfilter": "(CategoryIds/ANY(c: c EQ 'bbee6851-54dd-4f9e-b82a-645eab1c4f4e'))"
       // category filter with nested
-      // "containerfilter": "(CategoryIds/ANY(c: c EQ '13e8de71-5282-493d-a593-b8d13fa8c536') OR CategoryAncestorIds/ANY(c: c EQ '13e8de71-5282-493d-a593-b8d13fa8c536'))"
+      // "containerfilter": "(CategoryIds/ANY(c: c EQ 'bbee6851-54dd-4f9e-b82a-645eab1c4f4e') OR CategoryAncestorIds/ANY(c: c EQ 'bbee6851-54dd-4f9e-b82a-645eab1c4f4e'))"
     }
     const result = await axios.post(url, data, { headers: headers })
     setAssetCount(result.data.payload.assetCount)
   }
 
-  // ITERATE OFFSET
+  // ITERATE OFFSET 
   const getAssets = async (offset) => {
     const url = `${apiUrl}assets/search`
     // const url = `${apiUrl}categories/aec0ba15-92bb-43d7-8095-ccf2662b1fec/assets?count=1000&offset=${offset}&sort=record.createdAt+D`
@@ -92,18 +94,18 @@ const App = () => {
       //  AVI FIlter
       // "filters": "((AssetType EQ Video AND (videoIntelligence NE null AND videoIntelligence/videoIndexerId NE '')))",
       // filter filetype
-      // filters: "((DateExpired GE 2023-07-01T00:00:00.000Z AND DateExpired LE 2023-09-30T23:59:59.000Z))",
+      // filters: "((DateSoftDeleted GT 2023-02-17T23:04:05.963Z AND Status EQ 10))",
       "sort": "record.createdAt D",
-      // "containerfilter": "(CategoryIds/ANY(c: c EQ 'af1d3de8-a86e-4fe4-a1f3-ede329eb60d3'))"
+      // "containerfilter": "(CategoryIds/ANY(c: c EQ 'bbee6851-54dd-4f9e-b82a-645eab1c4f4e'))"
       // category filter with nested
-      // "containerfilter": "(CategoryIds/ANY(c: c EQ '13e8de71-5282-493d-a593-b8d13fa8c536') OR CategoryAncestorIds/ANY(c: c EQ '13e8de71-5282-493d-a593-b8d13fa8c536'))"
+      // "containerfilter": "(CategoryIds/ANY(c: c EQ 'bbee6851-54dd-4f9e-b82a-645eab1c4f4e') OR CategoryAncestorIds/ANY(c: c EQ 'bbee6851-54dd-4f9e-b82a-645eab1c4f4e'))"
     }
     // console.log(offset, lastDate)
     await axios.post(url, data, { headers: headers })
       .then((res) => {
         // filterMD5(res.data.payload.assets)
         filterAssets(res.data.payload.assets)
-        return ("DateUploaded LE " + res.data.payload.assets[res.data.payload.assets.length - 1].file.uploadedAt)
+        return ("DateUploaded GE " + res.data.payload.assets[res.data.payload.assets.length - 1].file.uploadedAt)
       })
       .then((date) => {
         if (filteredAssets.length < assetCount) {
@@ -136,9 +138,9 @@ const App = () => {
       // filter filetype
       // filters: "((DateExpired GE 2023-04-01T00:00:00.000Z AND DateExpired LE 2023-06-30T23:59:59.000Z))",
       "sort": "record.createdAt D",
-      // "containerfilter": "(CategoryIds/ANY(c: c EQ 'af1d3de8-a86e-4fe4-a1f3-ede329eb60d3'))"
+      // "containerfilter": "(CategoryIds/ANY(c: c EQ 'bbee6851-54dd-4f9e-b82a-645eab1c4f4e'))"
       // category filter with nested
-      // "containerfilter": "(CategoryIds/ANY(c: c EQ '13e8de71-5282-493d-a593-b8d13fa8c536') OR CategoryAncestorIds/ANY(c: c EQ '13e8de71-5282-493d-a593-b8d13fa8c536'))"
+      // "containerfilter": "(CategoryIds/ANY(c: c EQ 'bbee6851-54dd-4f9e-b82a-645eab1c4f4e') OR CategoryAncestorIds/ANY(c: c EQ 'bbee6851-54dd-4f9e-b82a-645eab1c4f4e'))"
     }
     // console.log(offset, lastDate)
     await axios.post(url, data, { headers: headers })
@@ -207,9 +209,9 @@ const App = () => {
       })
   }
 
-  const storeToTemp = () => {
-    localStorage.setItem('tempMeta', JSON.stringify(assets));
-  }
+  // const storeToTemp = () => {
+  //   localStorage.setItem('tempMeta', JSON.stringify(assets));
+  // }
 
   // get cognative metadata IMAGE
   const getCognitiveImageMetadata = async () => {
@@ -435,6 +437,54 @@ const App = () => {
     setFilteredAssets(filteredAssets => [...filteredAssets, ...tempFilteredAssets])
   }
 
+  const generateCDNLinks = () => {
+    for (let i = 1; i < filteredAssets.length; i += 199) {
+      if (filteredAssets.length - i > 200) {
+        setTimeout(() => {
+          generateCDNLinksBatch(i, 200)
+        }, i * 400);
+      } else {
+        setTimeout(() => {
+          generateCDNLinksBatch(i, (filteredAssets.length - i))
+        }, i * 400);
+      }
+    }
+  }
+
+  const generateCDNLinksBatch = (offset, max) => {
+    for (let count = offset; count < (offset + max); count++) {
+      let url = `${modernApiUrl}directlinks/${filteredAssets[count].AssetId}`
+      let body = {
+        "renditionSettings": {
+          "size": {
+            "type": "Large",
+            "width": filteredAssets[count]['Image Width'],
+            "height": filteredAssets[count]['Image Height']
+          },
+          "format": filteredAssets[count]['File Type']
+        },
+        "linkSettings": {
+          "isEmbedCode": false,
+          "isDevModeEnabled": false,
+          "isUniqueLink": false,
+          "turnSubtitlesOn": false,
+          "linkName": "Default"
+        }
+      }
+      axios.post(url, body, { headers: headers })
+        .then((res) => {
+          let temp = {
+            AssetId: res.data.payload.directLinkId,
+            CdnLink: res.data.payload.cdnLink
+          }
+          setCdnLinks(cdnLinks => [...cdnLinks, temp])
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    }
+  }
+
   const getXMP = () => {
     for (let count = 0; count < assetCount; count += 1000) {
       setTimeout(() => {
@@ -553,6 +603,7 @@ const App = () => {
       case 'usva':
         setApiUrl('https://api-usva.mediavalet.net/')
         setAuthUrl('https://identity-va.mediavalet.net/')
+        setModernApiURL('https://mv-api-usva.mediavalet.net/')
         break;
       case 'usva2':
         setApiUrl('https://mv-api-usva2.mediavalet.net/')
@@ -666,9 +717,9 @@ const App = () => {
       <div>
         Date {lastDate}
       </div>
-      <div>
+      {/* <div>
         <button onClick={storeToTemp}>Store To Local</button>
-      </div>
+      </div> */}
       {/* <div>
         <button onClick={getCategoryPath}>Get Category Paths</button>
       </div> */}
@@ -717,14 +768,17 @@ const App = () => {
         <CSVLink data={cognitiveVideoMetadata}>Export Video CognitiveMetadata</CSVLink>
       </div>
       <br />
-      <div>
-        <CSVLink data={xmpMetadata}>Export XMP Metadata</CSVLink>
-      </div>
-      <StoreContextProvider>
+      {/* <StoreContextProvider>
         <Assets />
-      </StoreContextProvider>
+      </StoreContextProvider> */}
       <br />
-      <br />
+      <div>
+        <button onClick={() => generateCDNLinks()}>Generate CDN Links</button>
+        <br />Total Links Generated: {cdnLinks.length}
+      </div>
+      <div>
+        <CSVLink data={cdnLinks}>Export CDN Links Created</CSVLink>
+      </div>
       <br />
       <div>
         <button onClick={() => getIPTC()}>get IPTC</button>
