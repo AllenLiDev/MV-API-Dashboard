@@ -30,6 +30,7 @@ const App = () => {
   const [exifMetadata, setExifMetadata] = useState([])
   const [xmpMetadata, setXmpMetadata] = useState([])
   const [cdnLinks, setCdnLinks] = useState([])
+  const [containerFilter, setContainerFilter] = useState()
 
   const headers = {
     'content-type': 'application/json',
@@ -66,14 +67,14 @@ const App = () => {
       //  AVI FIlter
       // "filters": "((AssetType EQ Video AND (videoIntelligence NE null AND videoIntelligence/videoIndexerId NE '')))",
       // "filters": "(((DateSoftDeleted GE 2022-08-30T00:00:00.000Z AND DateSoftDeleted LE 2022-11-28T23:59:59.000Z) AND Status EQ 10))",
-      // "includeSoftDeleted": true,
+      "includeSoftDeleted": true,
       // no expiry date assets
       // "filters": "((DateSoftDeleted GT 2023-02-17T23:04:05.963Z AND Status EQ 10))",
       "sort": "record.createdAt A",
       // category filter current cat without nested
       // "containerfilter": "(CategoryIds/ANY(c: c EQ 'bbee6851-54dd-4f9e-b82a-645eab1c4f4e'))"
       // category filter with nested
-      // "containerfilter": "(CategoryIds/ANY(c: c EQ 'bbee6851-54dd-4f9e-b82a-645eab1c4f4e') OR CategoryAncestorIds/ANY(c: c EQ 'bbee6851-54dd-4f9e-b82a-645eab1c4f4e'))"
+      "containerfilter": containerFilter
     }
     const result = await axios.post(url, data, { headers: headers })
     setAssetCount(result.data.payload.assetCount)
@@ -89,23 +90,24 @@ const App = () => {
       "offset": offset,
       "filters": lastDate,
       // "filters": `(((DateSoftDeleted GE 2022-08-30T00:00:00.000Z AND DateSoftDeleted LE 2022-11-28T23:59:59.000Z) AND Status EQ 10 ${dateFilter? "AND" + dateFilter:""}))`,
-      // "includeSoftDeleted": true,
+      "includeSoftDeleted": true,
       // "filters": (dateFilter === undefined) ? "((FileExtension EQ 'XML'))" : "(" + dateFilter + " AND (FileExtension EQ 'XML'))",
       //  AVI FIlter
       // "filters": "((AssetType EQ Video AND (videoIntelligence NE null AND videoIntelligence/videoIndexerId NE '')))",
       // filter filetype
-      // filters: "((DateSoftDeleted GT 2023-02-17T23:04:05.963Z AND Status EQ 10))",
+      // filters: "((DateSoftDeleted GT 2023-01-1T23:04:05.963Z AND Status EQ 10))",
+      // filters: "(((DateSoftDeleted GE 2023-01-01T00:00:00.000Z AND DateSoftDeleted LE 2023-03-31T23:59:59.000Z) AND Status EQ 10))"
       "sort": "record.createdAt D",
       // "containerfilter": "(CategoryIds/ANY(c: c EQ 'bbee6851-54dd-4f9e-b82a-645eab1c4f4e'))"
       // category filter with nested
-      // "containerfilter": "(CategoryIds/ANY(c: c EQ 'bbee6851-54dd-4f9e-b82a-645eab1c4f4e') OR CategoryAncestorIds/ANY(c: c EQ 'bbee6851-54dd-4f9e-b82a-645eab1c4f4e'))"
+      "containerfilter": containerFilter
     }
     // console.log(offset, lastDate)
     await axios.post(url, data, { headers: headers })
       .then((res) => {
         // filterMD5(res.data.payload.assets)
         filterAssets(res.data.payload.assets)
-        return ("DateUploaded GE " + res.data.payload.assets[res.data.payload.assets.length - 1].file.uploadedAt)
+        return ("DateUploaded LE " + res.data.payload.assets[res.data.payload.assets.length - 1].file.uploadedAt)
       })
       .then((date) => {
         if (filteredAssets.length < assetCount) {
@@ -137,7 +139,7 @@ const App = () => {
       // "filters": "((AssetType EQ Video AND (videoIntelligence NE null AND videoIntelligence/videoIndexerId NE '')))",
       // filter filetype
       // filters: "((DateExpired GE 2023-04-01T00:00:00.000Z AND DateExpired LE 2023-06-30T23:59:59.000Z))",
-      "sort": "record.createdAt D",
+      "sort": "record.createdAt A",
       // "containerfilter": "(CategoryIds/ANY(c: c EQ 'bbee6851-54dd-4f9e-b82a-645eab1c4f4e'))"
       // category filter with nested
       // "containerfilter": "(CategoryIds/ANY(c: c EQ 'bbee6851-54dd-4f9e-b82a-645eab1c4f4e') OR CategoryAncestorIds/ANY(c: c EQ 'bbee6851-54dd-4f9e-b82a-645eab1c4f4e'))"
@@ -146,7 +148,7 @@ const App = () => {
     await axios.post(url, data, { headers: headers })
       .then((res) => {
         filterMD5(res.data.payload.assets)
-        return ("DateUploaded LE " + res.data.payload.assets[res.data.payload.assets.length - 1].file.uploadedAt)
+        return ("DateUploaded GE " + res.data.payload.assets[res.data.payload.assets.length - 1].file.uploadedAt)
       })
       .then((date) => {
         if (filteredAssets.length < assetCount) {
@@ -218,28 +220,26 @@ const App = () => {
     let promises = []
     let data = []
     let count = 0
-    for (let asset of assets) {
-      if (count >= 9000 && count < 9999) {
-        if (asset.media.type === 'Image') {
-          let tags = []
-          let confidences = []
-          let url = `${apiUrl}assets/${asset.id}/autotags`
-          promises.push(
-            axios.get(url, { headers: headers })
-              .then(res => {
-                for (let tag in res.data.payload.tags) {
-                  tags.push(res.data.payload.tags[tag].name)
-                  confidences.push(res.data.payload.tags[tag].confidence)
-                }
-                let tempMetadata = {
-                  AssetId: asset.id,
-                  Tags: tags,
-                  Confidence: confidences
-                }
-                data.push(tempMetadata)
-              })
-          )
-        }
+    for (let asset of filteredAssets) {
+      if (count >= 15000 && count < 15999) {
+        let tags = []
+        let confidences = []
+        let url = `${apiUrl}assets/${asset.AssetId}/autotags`
+        promises.push(
+          axios.get(url, { headers: headers })
+            .then(res => {
+              for (let tag in res.data.payload.tags) {
+                tags.push(res.data.payload.tags[tag].name)
+                confidences.push(res.data.payload.tags[tag].confidence)
+              }
+              let tempMetadata = {
+                AssetId: asset.AssetId,
+                Tags: tags,
+                Confidence: confidences
+              }
+              data.push(tempMetadata)
+            })
+        )
       }
       count++
     }
@@ -588,6 +588,9 @@ const App = () => {
   const handleUsernameChange = (e) => {
     setUsername(e.target.value)
   }
+  const handleContainerFilterChange = (e) => {
+    setContainerFilter(`(CategoryIds/ANY(c: c EQ '${e.target.value}') OR CategoryAncestorIds/ANY(c: c EQ '${e.target.value}'))`)
+  }
   const handlePasswordChange = (e) => {
     setPassword(e.target.value)
   }
@@ -597,7 +600,7 @@ const App = () => {
   const handleDatacenterChange = (e) => {
     switch (e.target.value) {
       case 'usca':
-        setApiUrl('https://api-usca.mediavalet.net/')
+        setApiUrl('https://mv-api-usca.mediavalet.net/')
         setAuthUrl('https://identity-ca.mediavalet.net/')
         break;
       case 'usva':
@@ -706,6 +709,15 @@ const App = () => {
         <button onClick={() => getAssets(0)}>Get All Metadata</button>
       </div>
       <div>
+        <form>
+          <label>Category ID</label>
+          <input
+            name="Container Filter"
+            type="text"
+            onChange={handleContainerFilterChange} />
+        </form>
+      </div>
+      <div>
         <button>Get Embedded Metadata</button>
       </div>
       <div>
@@ -740,6 +752,7 @@ const App = () => {
       <br />
       <div>
         <button onClick={getCognitiveImageMetadata}>Get Image Cognitive Metadata</button>
+        <button onClick={() => setCognitiveImageMetadata([])}>Reset CM</button>
         {cognitiveImageMetadata.length}
       </div>
       <div>
